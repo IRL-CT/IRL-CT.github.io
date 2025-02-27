@@ -5,159 +5,218 @@ import Header from "@components/Header.astro";
 import Footer from "@components/Footer.astro";
 import LinkButton from "@components/LinkButton.astro";
 import Hr from "@components/Hr.astro";
-import Card from "@components/Card";
 import Socials from "@components/Socials.astro";
-import getSortedPosts from "@utils/getSortedPosts";
+import DoiPaperFeed from "@components/DoiPaperFeed.astro";
 import { SITE, SOCIALS } from "@config";
+import "../styles/home.css";
 
-const posts = await getCollection("blog");
+// Get projects
+const projects = await getCollection("projects");
+const featuredProjects = projects
+  .filter(project => project.data.featured)
+  .sort((a, b) => new Date(b.data.startDate).valueOf() - new Date(a.data.startDate).valueOf())
+  .slice(0, 3);
 
-const sortedPosts = getSortedPosts(posts);
-const featuredPosts = sortedPosts.filter(({ data }) => data.featured);
-const recentPosts = sortedPosts.filter(({ data }) => !data.featured);
+// Get team members
+const teamMembers = await getCollection("team");
+
+// Define role hierarchy for sorting, matching Team.astro
+const roleOrder = [
+  "Lab Director",
+  "PhD Candidate",
+  "Professor",
+  "Associate Professor",
+  "Assistant Professor", 
+  "PhD Student", 
+  "Graduate Student", 
+  "Master's Student",
+  "Undergraduate Student", 
+  "Alumni",
+  "Collaborator"
+];
+
+// Sort team members by role priority and then by name
+const sortedTeamMembers = teamMembers
+  .filter(member => member.data.featured !== false)
+  .sort((a, b) => {
+    // First sort by role hierarchy
+    const aIndex = roleOrder.findIndex(role => a.data.role.includes(role));
+    const bIndex = roleOrder.findIndex(role => b.data.role.includes(role));
+    
+    if (aIndex !== bIndex) {
+      // If role isn't in our predefined list, put it at the end
+      if (aIndex === -1) return 1;
+      if (bIndex === -1) return -1;
+      
+      return aIndex - bIndex;
+    }
+    
+    // If same role, sort by name
+    return a.data.name.localeCompare(b.data.name);
+  });
+
+// Get top 6 team members after sorting
+const displayTeamMembers = sortedTeamMembers.slice(0, 18);
+
+// Get publications DOIs directly without needing to sort here
+// The DoiPaperFeed component will handle sorting by date from the metadata
+const publications = await getCollection("publications");
+const dois = publications
+  .filter(pub => pub.data.doi)
+  .slice(0, 10) // Get a few more than we need in case some fail to load
+  .map(pub => pub.data.doi);
 
 const socialCount = SOCIALS.filter(social => social.active).length;
+
+// Format date helper
+function formatDate(date) {
+  if (!date) return "";
+  const parsedDate = date instanceof Date ? date : new Date(date);
+  if (isNaN(parsedDate.getTime())) return "";
+  
+  return parsedDate.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short'
+  });
+}
 ---
 
 <Layout>
   <Header />
-  <main id="main-content">
-    <section id="hero">
-      <h1>Mingalaba</h1>
-      <a
-        target="_blank"
-        href="/rss.xml"
-        class="rss-link"
-        aria-label="rss feed"
-        title="RSS Feed"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" class="rss-icon"
-          ><path
-            d="M19 20.001C19 11.729 12.271 5 4 5v2c7.168 0 13 5.832 13 13.001h2z"
-          ></path><path
-            d="M12 20.001h2C14 14.486 9.514 10 4 10v2c4.411 0 8 3.589 8 8.001z"
-          ></path><circle cx="6" cy="18" r="2"></circle>
-        </svg>
-        <span class="sr-only">RSS Feed</span>
-      </a>
-
-      <p>
-        AstroPaper is a minimal, responsive, accessible and SEO-friendly Astro
-        blog theme. This theme follows best practices and provides accessibility
-        out of the box. Light and dark mode are supported by default. Moreover,
-        additional color schemes can also be configured.
-      </p>
-      <p>
-        Read the blog posts or check
-        <LinkButton
-          className="underline decoration-dashed underline-offset-4 hover:text-skin-accent"
-          href="https://github.com/satnaing/astro-paper#readme"
-        >
-          README
-        </LinkButton> for more info.
-      </p>
-      {
-        // only display if at least one social link is enabled
-        socialCount > 0 && (
-          <div class="social-wrapper">
-            <div class="social-links">Social Links:</div>
-            <Socials />
-          </div>
-        )
-      }
+  <main id="main-content" class="cidrl-main">
+    <section id="hero" class="cidrl-hero">
+      <div class="hero-content">
+        <h1>Cornell Interaction Design Research Lab</h1>
+        <p class="hero-tagline">
+          Advancing the frontiers of human-computer interaction through innovative research and design
+        </p>
+        <p class="hero-description">
+          The Cornell Interaction Design Research Lab (CIDRL) explores the intersection of human behavior, 
+          technology, and design to create more intuitive, accessible, and meaningful interactive experiences.
+        </p>
+        <div class="hero-buttons">
+          <a href="/about/" class="primary-button">
+            About Us
+          </a>
+          <a href="/projects/" class="secondary-button">
+            View Projects
+          </a>
+        </div>
+      </div>
+      <div class="hero-video-container">
+        <iframe 
+          class="hero-video"
+          src="https://www.youtube.com/embed/o52MZ1AHyjA?si=q7sPaSTebT1WbJMS" 
+          title="CIDRL Research Overview"
+          frameborder="0" 
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+          allowfullscreen>
+        </iframe>
+      </div>
     </section>
 
     <Hr />
 
-    {
-      featuredPosts.length > 0 && (
-        <>
-          <section id="featured">
-            <h2>Featured</h2>
-            <ul>
-              {featuredPosts.map(({ data, slug }) => (
-                <Card
-                  href={`/posts/${slug}/`}
-                  frontmatter={data}
-                  secHeading={false}
-                />
-              ))}
-            </ul>
-          </section>
-          {recentPosts.length > 0 && <Hr />}
-        </>
-      )
-    }
-
-    {
-      recentPosts.length > 0 && (
-        <section id="recent-posts">
-          <h2>Recent Posts</h2>
-          <ul>
-            {recentPosts.map(
-              ({ data, slug }, index) =>
-                index < SITE.postPerIndex && (
-                  <Card
-                    href={`/posts/${slug}/`}
-                    frontmatter={data}
-                    secHeading={false}
-                  />
-                )
-            )}
-          </ul>
+    <div class="main-with-sidebar-layout">
+      <div class="main-content">
+        <section id="featured-projects">
+          <h2>Featured Research</h2>
+          <div class="project-list">
+            {
+              featuredProjects.map(project => (
+                <a href={`/projects/${project.slug}/`} class="project-card">
+                  <div class="project-image">
+                    {project.data.image ? (
+                      <img src={project.data.image.src} alt={project.data.title} />
+                    ) : (
+                      <div class="project-image-placeholder"></div>
+                    )}
+                  </div>
+                  <div class="project-card-content">
+                    <div class="project-status-badge" data-status={project.data.status}>
+                      {project.data.status}
+                    </div>
+                    <h3>{project.data.title}</h3>
+                    <p>{project.data.summary}</p>
+                  </div>
+                </a>
+              ))
+            }
+          </div>
+          <div class="section-link">
+            <LinkButton href="/projects/">
+              All Projects
+              <svg xmlns="http://www.w3.org/2000/svg"
+                ><path
+                  d="m11.293 17.293 1.414 1.414L19.414 12l-6.707-6.707-1.414 1.414L15.586 11H6v2h9.586z"
+                ></path>
+              </svg>
+            </LinkButton>
+          </div>
         </section>
-      )
-    }
 
-    <div class="all-posts-btn-wrapper">
-      <LinkButton href="/posts/">
-        All Posts
-        <svg xmlns="http://www.w3.org/2000/svg"
-          ><path
-            d="m11.293 17.293 1.414 1.414L19.414 12l-6.707-6.707-1.414 1.414L15.586 11H6v2h9.586z"
-          ></path>
-        </svg>
-      </LinkButton>
+        <Hr />
+
+        <section id="team-members">
+          <h2>Research Team</h2>
+          <div class="team-grid">
+            {
+              displayTeamMembers.map(member => (
+                <a href={`/team/${member.slug}/`} class="team-card">
+                  <div class="member-avatar">
+                    {member.data.avatar ? (
+                      <img 
+                        src={member.data.avatar.src} 
+                        alt={`Photo of ${member.data.name}`} 
+                      />
+                    ) : (
+                      <div class="avatar-placeholder">
+                        {member.data.name.charAt(0)}
+                      </div>
+                    )}
+                  </div>
+                  <div class="member-info">
+                    <h3>{member.data.name}</h3>
+                    <p>{member.data.role}</p>
+                  </div>
+                </a>
+              ))
+            }
+          </div>
+          <div class="section-link">
+            <LinkButton href="/team/">
+              View Full Team
+              <svg xmlns="http://www.w3.org/2000/svg"
+                ><path
+                  d="m11.293 17.293 1.414 1.414L19.414 12l-6.707-6.707-1.414 1.414L15.586 11H6v2h9.586z"
+                ></path>
+              </svg>
+            </LinkButton>
+          </div>
+        </section>
+
+        {
+          socialCount > 0 && (
+            <div class="social-wrapper">
+              <div class="social-links">Connect with us:</div>
+              <Socials />
+            </div>
+          )
+        }
+      </div>
+
+      <div class="sidebar">
+        <aside class="publications-sidebar">
+          <DoiPaperFeed 
+            dois={dois} 
+            title="Recent Publications" 
+            viewAllUrl="/publications/"
+            maxItems={5}
+          />
+        </aside>
+      </div>
     </div>
   </main>
 
   <Footer />
 </Layout>
-
-<style>
-  /* ===== Hero Section ===== */
-  #hero {
-    @apply pb-6 pt-8;
-  }
-  #hero h1 {
-    @apply my-4 inline-block text-3xl font-bold sm:my-8 sm:text-5xl;
-  }
-  #hero .rss-link {
-    @apply mb-6;
-  }
-  #hero .rss-icon {
-    @apply mb-2 h-6 w-6 scale-110 fill-skin-accent sm:mb-3 sm:scale-125;
-  }
-  #hero p {
-    @apply my-2;
-  }
-  .social-wrapper {
-    @apply mt-4 flex flex-col sm:flex-row sm:items-center;
-  }
-  .social-links {
-    @apply mb-1 mr-2 whitespace-nowrap sm:mb-0;
-  }
-
-  /* ===== Featured & Recent Posts Sections ===== */
-  #featured,
-  #recent-posts {
-    @apply pb-6 pt-12;
-  }
-  #featured h2,
-  #recent-posts h2 {
-    @apply text-2xl font-semibold tracking-wide;
-  }
-  .all-posts-btn-wrapper {
-    @apply my-8 text-center;
-  }
-</style>

@@ -1,0 +1,59 @@
+{
+  "lastUpdated": "2025-02-27T05:51:45.710Z",
+  "publications": {
+    "10.1145/3173574.3173739": {
+      "doi": "10.1145/3173574.3173739",
+      "title": "VR-OOM",
+      "authors": "David Goedicke, Jamy Li, Vanessa Evers, Wendy Ju",
+      "venue": "Proceedings of the 2018 CHI Conference on Human Factors in Computing Systems",
+      "pubDate": "2018-04-19T04:00:00.000Z",
+      "pubYear": "2018",
+      "fetchedAt": "2025-02-27T05:51:42.772Z"
+    },
+    "10.1109/TVT.2022.3152611": {
+      "doi": "10.1109/TVT.2022.3152611",
+      "title": "Strangers in a Strange Land: New Experimental System for Understanding Driving Culture Using VR",
+      "authors": "David Goedicke, Carmel Zolkov, Natalie Friedman, Talia Wise, Avi Parush, Wendy Ju",
+      "venue": "IEEE Transactions on Vehicular Technology",
+      "pubDate": "2022-04-01T04:00:00.000Z",
+      "pubYear": "2022",
+      "fetchedAt": "2025-02-27T05:51:42.962Z"
+    },
+    "10.1145/3491102.3517704": {
+      "doi": "10.1145/3491102.3517704",
+      "title": "XR-OOM: MiXed Reality driving simulation with real cars for research and design",
+      "authors": "David Goedicke, Alexandra W.D. Bremers, Sam Lee, Fanjun Bu, Hiroshi Yasuda, Wendy Ju",
+      "venue": "CHI Conference on Human Factors in Computing Systems",
+      "pubDate": "2022-04-27T04:00:00.000Z",
+      "pubYear": "2022",
+      "fetchedAt": "2025-02-27T05:51:43.033Z"
+    },
+    "10.1145/3640792.3675740": {
+      "doi": "10.1145/3640792.3675740",
+      "title": "Towards Instrumented Fingerprinting of Urban Traffic: A Novel Methodology using Distributed Mobile Point-of-View Cameras",
+      "authors": "Matt Franchi, Debargha Dey, Wendy Ju",
+      "venue": "Proceedings of the 16th International Conference on Automotive User Interfaces and Interactive Vehicular Applications",
+      "pubDate": "2024-09-22T04:00:00.000Z",
+      "pubYear": "2024",
+      "fetchedAt": "2025-02-27T05:51:43.062Z"
+    },
+    "10.1145/3319502.3374790": {
+      "doi": "10.1145/3319502.3374790",
+      "title": "On-Road and Online Studies to Investigate Beliefs and Behaviors of Netherlands, US and Mexico Pedestrians Encountering Hidden-Driver Vehicles",
+      "authors": "Jamy Li, Rebecca Currano, David Sirkin, David Goedicke, Hamish Tennent, Aaron Levine, Vanessa Evers, Wendy Ju",
+      "venue": "Proceedings of the 2020 ACM/IEEE International Conference on Human-Robot Interaction",
+      "pubDate": "2020-03-09T04:00:00.000Z",
+      "pubYear": "2020",
+      "fetchedAt": "2025-02-27T05:51:45.428Z"
+    },
+    "10.1145/3593013.3594020": {
+      "doi": "10.1145/3593013.3594020",
+      "title": "Detecting disparities in police deployments using dashcam data",
+      "authors": "Matt Franchi, J.D. Zamfirescu-Pereira, Wendy Ju, Emma Pierson",
+      "venue": "2023 ACM Conference on Fairness, Accountability, and Transparency",
+      "pubDate": "2023-06-12T04:00:00.000Z",
+      "pubYear": "2023",
+      "fetchedAt": "2025-02-27T05:51:45.710Z"
+    }
+  }
+}

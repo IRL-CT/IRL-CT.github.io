@@ -10,15 +10,20 @@
     "astro": "astro",
     "format:check": "prettier --check . --plugin=prettier-plugin-astro",
     "format": "prettier --write . --plugin=prettier-plugin-astro",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "update-publications": "node src/scripts/updatePublicationCache.js"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.3",
+    "@astrojs/mdx": "^4.0.8",
     "@astrojs/rss": "^4.0.7",
     "@resvg/resvg-js": "^2.6.2",
     "astro": "^4.16.18",
     "fuse.js": "^7.0.0",
+    "glob": "^10.3.10",
+    "gray-matter": "^4.0.3",
     "lodash.kebabcase": "^4.1.1",
+    "mdx": "^0.3.1",
     "remark-collapse": "^0.1.2",
     "remark-toc": "^9.0.0",
     "satori": "^0.11.0",

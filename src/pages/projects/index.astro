@@ -1,0 +1,91 @@
+---
+import { getCollection } from "astro:content";
+import Layout from "@layouts/Layout.astro";
+import Header from "@components/Header.astro";
+import Footer from "@components/Footer.astro";
+import LinkButton from "@components/LinkButton.astro";
+import Hr from "@components/Hr.astro";
+import { SITE } from "@config";
+import "@styles/projects.css";
+
+// Get all projects
+const projects = await getCollection("projects");
+
+// Sort by status and start date
+const sortedProjects = projects.sort((a, b) => {
+  // Sort by status priority (ongoing first, then planned, then completed)
+  const statusOrder = { ongoing: 0, planned: 1, completed: 2 };
+  const statusDiff = statusOrder[a.data.status] - statusOrder[b.data.status];
+  
+  if (statusDiff !== 0) return statusDiff;
+  
+  // If same status, sort by startDate (most recent first)
+  return new Date(b.data.startDate).getTime() - new Date(a.data.startDate).getTime();
+});
+
+// Format date helper
+function formatDate(dateStr) {
+  if (!dateStr) return "";
+  const date = new Date(dateStr);
+  if (isNaN(date.getTime())) return "";
+  
+  return date.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short'
+  });
+}
+---
+
+<Layout title={`Projects | ${SITE.title}`}>
+  <Header activeNav="projects" />
+  <main id="main-content" class="projects-index-container">
+    <section>
+      <h1>Research Projects</h1>
+      <p class="projects-description">
+        Explore our research projects focusing on human-computer interaction, 
+        user experience, accessibility, and design methodologies.
+      </p>
+    </section>
+    
+    <Hr />
+    
+    <section>
+      <div class="projects-container">
+        {
+          sortedProjects.map(project => (
+            <a href={`/projects/${project.slug}/`} class="project-card">
+              <div class="project-image">
+                {project.data.image ? (
+                  <img src={project.data.image.src} alt={project.data.title} loading="lazy" />
+                ) : (
+                  <div class="project-image-placeholder"></div>
+                )}
+              </div>
+              <div class="project-content">
+                <div class="project-status-badge" data-status={project.data.status}>
+                  {project.data.status}
+                </div>
+                <h2 class="project-title">{project.data.title}</h2>
+                <p class="project-dates">
+                  {formatDate(project.data.startDate)}
+                  {project.data.endDate && ` - ${formatDate(project.data.endDate)}`}
+                </p>
+                <p class="project-summary">{project.data.summary}</p>
+                <div class="project-tags">
+                  {project.data.tags.slice(0, 3).map(tag => (
+                    <span class="project-tag">{tag}</span>
+                  ))}
+                  {project.data.tags.length > 3 && (
+                    <span class="project-tag-more">+{project.data.tags.length - 3}</span>
+                  )}
+                </div>
+              </div>
+            </a>
+          ))
+        }
+      </div>
+    </section>
+  </main>
+  
+  <Footer />
+</Layout>

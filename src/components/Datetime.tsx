@@ -16,6 +16,41 @@ interface Props extends DatetimesProps, EditPostProps {
   className?: string;
 }
 
+// Helper function to safely parse dates
+function parseDate(date: string | Date | undefined | null): Date | null {
+  if (!date) return null;
+  
+  // If it's already a Date object, return it
+  if (date instanceof Date) return date;
+
+  // Handle simple date formats like "2023-08-15" by appending time
+  if (/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+    date = `${date}T00:00:00Z`;
+  }
+  
+  try {
+    const parsedDate = new Date(date);
+    // Check if the date is valid
+    if (isNaN(parsedDate.getTime())) {
+      console.warn(`Invalid date format: ${date}`);
+      return null;
+    }
+    return parsedDate;
+  } catch (error) {
+    console.error(`Error parsing date ${date}:`, error);
+    return null;
+  }
+}
+
+// Helper function to compare dates safely
+function isDateAfter(date1: string | Date | undefined | null, date2: string | Date | undefined | null): boolean {
+  const parsedDate1 = parseDate(date1);
+  const parsedDate2 = parseDate(date2);
+  
+  if (!parsedDate1 || !parsedDate2) return false;
+  return parsedDate1 > parsedDate2;
+}
+
 export default function Datetime({
   pubDatetime,
   modDatetime,
@@ -38,7 +73,7 @@ export default function Datetime({
         <path d="M7 11h2v2H7zm0 4h2v2H7zm4-4h2v2h-2zm0 4h2v2h-2zm4-4h2v2h-2zm0 4h2v2h-2z"></path>
         <path d="M5 22h14c1.103 0 2-.897 2-2V6c0-1.103-.897-2-2-2h-2V2h-2v2H9V2H7v2H5c-1.103 0-2 .897-2 2v14c0 1.103.897 2 2 2zM19 8l.001 12H5V8h14z"></path>
       </svg>
-      {modDatetime && modDatetime > pubDatetime ? (
+      {modDatetime && isDateAfter(modDatetime, pubDatetime) ? (
         <span className={`italic ${size === "sm" ? "text-sm" : "text-base"}`}>
           Updated:
         </span>
@@ -57,24 +92,29 @@ export default function Datetime({
 }
 
 const FormattedDatetime = ({ pubDatetime, modDatetime }: DatetimesProps) => {
-  const myDatetime = new Date(
-    modDatetime && modDatetime > pubDatetime ? modDatetime : pubDatetime
-  );
+  const useModDatetime = modDatetime && isDateAfter(modDatetime, pubDatetime);
+  const dateToUse = useModDatetime ? modDatetime : pubDatetime;
+  
+  const parsedDate = parseDate(dateToUse);
+  
+  if (!parsedDate) {
+    return <span>Invalid date</span>;
+  }
 
-  const date = myDatetime.toLocaleDateString(LOCALE.langTag, {
+  const date = parsedDate.toLocaleDateString(LOCALE.langTag, {
     year: "numeric",
     month: "short",
     day: "numeric",
   });
 
-  const time = myDatetime.toLocaleTimeString(LOCALE.langTag, {
+  const time = parsedDate.toLocaleTimeString(LOCALE.langTag, {
     hour: "2-digit",
     minute: "2-digit",
   });
 
   return (
     <>
-      <time dateTime={myDatetime.toISOString()}>{date}</time>
+      <time dateTime={parsedDate.toISOString()}>{date}</time>
       <span aria-hidden="true"> | </span>
       <span className="sr-only">&nbsp;at&nbsp;</span>
       <span className="text-nowrap">{time}</span>

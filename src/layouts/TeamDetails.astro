@@ -1,0 +1,391 @@
+---
+import Layout from "@layouts/Layout.astro";
+import Header from "@components/Header.astro";
+import Footer from "@components/Footer.astro";
+import { getCollection } from "astro:content";
+import { slugifyStr } from "@utils/slugify";
+import ShareLinks from "@components/ShareLinks.astro";
+import { SITE } from "@config";
+import "@styles/team.css";
+import type { CollectionEntry } from "astro:content";
+
+export interface Props {
+  member: CollectionEntry<"team">;
+  teamMembers: CollectionEntry<"team">[];
+}
+
+const { member, teamMembers } = Astro.props;
+
+// Use member.slug instead of the custom id field
+const {
+  name,
+  role,
+  title,
+  department,
+  avatar,
+  email,
+  website,
+  socialLinks,
+  joinDate,
+  endDate,
+  active,
+  bio,
+  education,
+  research_interests
+} = member.data;
+
+// Get projects associated with this team member
+let memberProjects = [];
+try {
+  const projects = await getCollection("projects");
+  memberProjects = projects.filter(project => 
+    project.data.teamMemberIds && project.data.teamMemberIds.includes(member.slug)
+  );
+} catch (error) {
+  console.error("Error fetching projects:", error);
+}
+
+// Get publications associated with this team member
+// This is a more complex query that would require additional metadata
+// to link publications to team members directly
+let memberPublications = [];
+
+// Format date function
+function formatDate(date) {
+  if (!date) return "Date unavailable";
+  
+  const parsedDate = typeof date === 'string' ? new Date(date) : date;
+  
+  if (isNaN(parsedDate.getTime())) {
+    console.warn(`Invalid date: ${date}`);
+    return "Date unavailable";
+  }
+  
+  return new Intl.DateTimeFormat('en-US', { 
+    year: 'numeric', 
+    month: 'long'
+  }).format(parsedDate);
+}
+
+// Helper to check if a value is valid and non-empty
+function isValid(value) {
+  if (value === null || value === undefined) return false;
+  if (Array.isArray(value)) return value.length > 0;
+  if (typeof value === 'string') return value.trim() !== '';
+  if (typeof value === 'object') return Object.keys(value).length > 0;
+  return true;
+}
+
+// Social media icons mapping
+const socialIcons = {
+  github: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>`,
+  twitter: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/></svg>`,
+  linkedin: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>`,
+  googleScholar: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 24a7 7 0 1 1 0-14 7 7 0 0 1 0 14zm0-24L0 9.5l4.838 3.94A8 8 0 0 1 12 9a8 8 0 0 1 7.162 4.44L24 9.5z"/></svg>`
+};
+
+const ogImageUrl = avatar?.src || `/team/${member.slug}.png`;
+const ogUrl = new URL(ogImageUrl, Astro.url.origin).href;
+
+const layoutProps = {
+  title: `${name} | Team | ${SITE.title}`,
+  description: `${name} is a ${role} at the Cornell Interaction Design Research Lab`,
+  ogImage: ogUrl,
+  scrollSmooth: true,
+};
+
+const activeSocials = Object.entries(socialLinks || {})
+  .filter(([_, url]) => url)
+  .map(([platform, url]) => ({
+    platform,
+    url,
+    icon: socialIcons[platform] || ''
+  }));
+---
+
+<Layout {...layoutProps}>
+  <Header activeNav="team" />
+
+  <div class="mx-auto flex w-full max-w-3xl justify-start px-2">
+    <button
+      class="focus-outline mb-2 mt-8 flex hover:opacity-75"
+      onclick="(() => (history.length === 1) ? window.location = '/team' : history.back())()"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg"
+        ><path
+          d="M13.293 6.293 7.586 12l5.707 5.707 1.414-1.414L10.414 12l4.293-4.293z"
+        ></path>
+      </svg><span>Go back</span>
+    </button>
+  </div>
+  
+  <main id="main-content">
+    <div class="team-member-header">
+      <div class="member-avatar-container">
+        {isValid(avatar) ? (
+          <img 
+            src={avatar.src} 
+            alt={`Photo of ${name}`}
+            class="member-avatar"
+            transition:name={`avatar-${slugifyStr(member.slug)}`}
+          />
+        ) : (
+          <div class="member-avatar-placeholder">
+            {name ? name.charAt(0) : "?"}
+          </div>
+        )}
+      </div>
+      
+      <div class="member-header-content">
+        <h1 transition:name={slugifyStr(name)} class="member-name">
+          {name}
+        </h1>
+        
+        <p class="member-role">{role}</p>
+        
+        {isValid(department) && (
+          <p class="member-department">{department}</p>
+        )}
+        
+        <p class="member-duration">
+          {active ? "Member since " : "Former member, "}
+          {isValid(joinDate) ? formatDate(joinDate) : "unknown date"}
+          {isValid(endDate) && !active ? ` until ${formatDate(endDate)}` : ""}
+        </p>
+        
+        <div class="member-contact-links">
+          {isValid(email) && (
+            <a href={`mailto:${email}`} class="contact-link email-link">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                <polyline points="22,6 12,13 2,6"></polyline>
+              </svg>
+              <span>{email}</span>
+            </a>
+          )}
+          
+          {isValid(website) && (
+            <a href={website} target="_blank" rel="noopener noreferrer" class="contact-link website-link">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="2" y1="12" x2="22" y2="12"></line>
+                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+              </svg>
+              <span>Website</span>
+            </a>
+          )}
+        </div>
+        
+        {activeSocials.length > 0 && (
+          <div class="social-links">
+            {activeSocials.map(social => (
+              <a href={social.url} target="_blank" rel="noopener noreferrer" class="social-link" title={social.platform}>
+                <Fragment set:html={social.icon} />
+              </a>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+
+    <div class="member-content">
+      <div class="member-main">
+        <section class="member-bio">
+          <h2>About</h2>
+          {isValid(bio) ? (
+            <div class="bio-content">
+              {bio}
+            </div>
+          ) : (
+            <div class="data-missing">No biographical information available.</div>
+          )}
+        </section>
+        
+        {isValid(research_interests) && (
+          <section class="research-interests">
+            <h2>Research Interests</h2>
+            <ul class="interest-list">
+              {research_interests.map(interest => (
+                <li class="interest-item">{interest}</li>
+              ))}
+            </ul>
+          </section>
+        )}
+        
+        {isValid(memberProjects) && memberProjects.length > 0 && (
+          <section class="member-projects">
+            <h2>Projects</h2>
+            <div class="projects-grid">
+              {memberProjects.map(project => (
+                <a href={`/projects/${project.data.id}/`} class="project-card">
+                  {project.data.image && (
+                    <div class="project-image">
+                      <img src={project.data.image.src} alt={project.data.title} />
+                    </div>
+                  )}
+                  <div class="project-content">
+                    <div class="project-status-badge" data-status={project.data.status}>
+                      {project.data.status}
+                    </div>
+                    <h3 class="project-title">{project.data.title}</h3>
+                    <p class="project-summary">{project.data.summary}</p>
+                  </div>
+                </a>
+              ))}
+            </div>
+          </section>
+        )}
+      </div>
+      
+      <aside class="member-sidebar">
+        {isValid(education) && (
+          <div class="education-section">
+            <h3>Education</h3>
+            <ul class="education-list">
+              {education.map(edu => (
+                <li class="education-item">
+                  <span class="degree">{edu.degree}</span>
+                  <span class="institution">{edu.institution}</span>
+                  <span class="year">{edu.year}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+        
+        {/* If we had connected publications */}
+        {isValid(memberPublications) && memberPublications.length > 0 && (
+          <div class="publications-section">
+            <h3>Publications</h3>
+            <ul class="publication-list">
+              {memberPublications.map(pub => (
+                <li class="publication-item">
+                  <a href={`/publications/${pub.slug}/`}>{pub.data.title}</a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+        
+        {/* Related team members - could show others with same role */}
+        <div class="related-members">
+          <h3>Team Members</h3>
+          <div class="related-members-grid">
+            {teamMembers
+              .filter(m => m.data.id !== member.slug && m.data.role === role)
+              .slice(0, 3)
+              .map(m => (
+                <a href={`/team/${m.data.id}/`} class="related-member">
+                  <div class="related-member-avatar">
+                    {m.data.avatar ? (
+                      <img src={m.data.avatar.src} alt={m.data.name} />
+                    ) : (
+                      <div class="avatar-placeholder">{m.data.name.charAt(0)}</div>
+                    )}
+                  </div>
+                  <span class="related-member-name">{m.data.name}</span>
+                </a>
+              ))
+            }
+          </div>
+          <div class="view-all-link">
+            <a href="/team/">View All Team Members</a>
+          </div>
+        </div>
+      </aside>
+    </div>
+    
+    <div class="flex flex-col-reverse items-center justify-between gap-6 sm:flex-row-reverse sm:items-end sm:gap-4">
+      <button
+        id="back-to-top"
+        class="focus-outline whitespace-nowrap py-1 hover:opacity-75"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" class="rotate-90">
+          <path
+            d="M13.293 6.293 7.586 12l5.707 5.707 1.414-1.414L10.414 12l4.293-4.293z"
+          ></path>
+        </svg>
+        <span>Back to Top</span>
+      </button>
+
+      <ShareLinks />
+    </div>
+  </main>
+  
+  <Footer />
+</Layout>
+
+<script is:inline>
+  /** Create a progress indicator
+   *  at the top */
+  function createProgressBar() {
+    // Create the main container div
+    const progressContainer = document.createElement("div");
+    progressContainer.className =
+      "progress-container fixed top-0 z-10 h-1 w-full bg-skin-fill";
+
+    // Create the progress bar div
+    const progressBar = document.createElement("div");
+    progressBar.className = "progress-bar h-1 w-0 bg-skin-accent";
+    progressBar.id = "myBar";
+
+    // Append the progress bar to the progress container
+    progressContainer.appendChild(progressBar);
+
+    // Append the progress container to the document body
+    document.body.appendChild(progressContainer);
+  }
+  createProgressBar();
+
+  /** Update the progress bar
+   *  when user scrolls */
+  function updateScrollProgress() {
+    document.addEventListener("scroll", () => {
+      const winScroll =
+        document.body.scrollTop || document.documentElement.scrollTop;
+      const height =
+        document.documentElement.scrollHeight -
+        document.documentElement.clientHeight;
+      const scrolled = (winScroll / height) * 100;
+      if (document) {
+        const myBar = document.getElementById("myBar");
+        if (myBar) {
+          myBar.style.width = scrolled + "%";
+        }
+      }
+    });
+  }
+  updateScrollProgress();
+
+  /** Attaches links to headings in the document,
+   *  allowing sharing of sections easily */
+  function addHeadingLinks() {
+    const headings = Array.from(
+      document.querySelectorAll("h2, h3, h4, h5, h6")
+    );
+    for (const heading of headings) {
+      heading.classList.add("group");
+      const link = document.createElement("a");
+      link.className =
+        "heading-link ml-2 opacity-0 group-hover:opacity-100 focus:opacity-100";
+      link.href = "#" + heading.id;
+
+      const span = document.createElement("span");
+      span.ariaHidden = "true";
+      span.innerText = "#";
+      link.appendChild(span);
+      heading.appendChild(link);
+    }
+  }
+  addHeadingLinks();
+
+  /** Scrolls the document to the top when
+   * the "Back to Top" button is clicked. */
+  function backToTop() {
+    document.querySelector("#back-to-top")?.addEventListener("click", () => {
+      document.body.scrollTop = 0; // For Safari
+      document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
+    });
+  }
+  backToTop();
+</script>

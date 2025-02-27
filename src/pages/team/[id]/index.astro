@@ -1,0 +1,18 @@
+---
+import { type CollectionEntry, getCollection } from "astro:content";
+import TeamDetails from "@layouts/TeamDetails.astro";
+
+export async function getStaticPaths() {
+  const teamMembers = await getCollection("team");
+  
+  return teamMembers.map(member => ({
+    params: { id: member.slug },
+    props: { member },
+  }));
+}
+
+const { member } = Astro.props;
+const teamMembers = await getCollection("team");
+---
+
+<TeamDetails member={member} teamMembers={teamMembers} />

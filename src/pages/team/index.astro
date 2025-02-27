@@ -1,0 +1,21 @@
+---
+import { getCollection } from "astro:content";
+import TeamLayout from "@layouts/Team.astro";
+
+// Get all team members
+const allTeamMembers = await getCollection("team");
+
+// Sort active members first, then by joinDate (most recent first)
+const sortedTeamMembers = allTeamMembers.sort((a, b) => {
+  // First sort by active status
+  if (a.data.active && !b.data.active) return -1;
+  if (!a.data.active && b.data.active) return 1;
+  
+  // Then sort by join date (most recent first)
+  const aDate = new Date(a.data.joinDate);
+  const bDate = new Date(b.data.joinDate);
+  return bDate.getTime() - aDate.getTime();
+});
+---
+
+<TeamLayout teamMembers={sortedTeamMembers} />

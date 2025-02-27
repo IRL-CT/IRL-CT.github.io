@@ -1,0 +1,61 @@
+---
+import { SITE } from "@config";
+import { getCollection } from "astro:content";
+import Projects from "@layouts/Projects.astro";
+import getPageNumbers from "@utils/getPageNumbers";
+
+export async function getStaticPaths() {
+  const projects = await getCollection("projects");
+  // Use postPerPage as a fallback if projectsPerPage is not defined
+  const projectsPerPage = SITE.projectsPerPage || SITE.postPerPage || 10;
+  
+  // Filter out drafts if applicable (assuming projects might have a draft property)
+  const filteredProjects = projects.filter(project => !project.data.draft);
+  
+  // Sort projects - first by status priority, then by date
+  const sortedProjects = filteredProjects.sort((a, b) => {
+    // Sort by status priority (ongoing first, then planned, then completed)
+    const statusOrder = { ongoing: 0, planned: 1, completed: 2 };
+    const statusDiff = statusOrder[a.data.status] - statusOrder[b.data.status];
+    
+    if (statusDiff !== 0) return statusDiff;
+    
+    // If same status, sort by startDate (most recent first)
+    return new Date(b.data.startDate).getTime() - new Date(a.data.startDate).getTime();
+  });
+  
+  const totalPages = Math.ceil(filteredProjects.length / projectsPerPage);
+  
+  return getPageNumbers(totalPages).map(pageNum => ({
+    params: { page: pageNum.toString() },
+    props: { projects: sortedProjects },
+  }));
+}
+
+const { page } = Astro.params;
+const { projects } = Astro.props;
+
+const projectsPerPage = SITE.projectsPerPage || SITE.postPerPage || 10;
+const totalPages = Math.ceil(projects.length / projectsPerPage);
+
+const currentPage = parseInt(page);
+const lastProject = currentPage * projectsPerPage;
+const startProject = lastProject - projectsPerPage;
+
+const paginatedProjects = projects.slice(startProject, lastProject);
+
+// Create pagination object that matches what the Projects layout expects
+const pagination = {
+  currentPage: currentPage,
+  lastPage: totalPages,
+  url: {
+    current: `/projects/${currentPage}`,
+    prev: currentPage > 1 ? `/projects/${currentPage - 1}` : null,
+    next: currentPage < totalPages ? `/projects/${currentPage + 1}` : null,
+  },
+  total: projects.length,
+  data: paginatedProjects,
+};
+---
+
+<Projects page={pagination} />

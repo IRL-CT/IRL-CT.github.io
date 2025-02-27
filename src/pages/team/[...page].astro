@@ -1,0 +1,76 @@
+---
+import { SITE } from "@config";
+import { getCollection } from "astro:content";
+import Team from "@layouts/Team.astro";
+import getPageNumbers from "@utils/getPageNumbers";
+
+export async function getStaticPaths() {
+  const teamMembers = await getCollection("team");
+  const teamMembersPerPage = SITE.postPerPage || 9;
+  
+  // First sort by active status, then by role and name
+  const sortedTeamMembers = teamMembers.sort((a, b) => {
+    // First sort by active status (active members first)
+    if (a.data.active && !b.data.active) return -1;
+    if (!a.data.active && b.data.active) return 1;
+    
+    // Then by role (could add a custom sorting logic based on role importance)
+    if (a.data.role !== b.data.role) return a.data.role.localeCompare(b.data.role);
+    
+    // Finally by name
+    return a.data.name.localeCompare(b.data.name);
+  });
+  
+  const totalPages = Math.ceil(sortedTeamMembers.length / teamMembersPerPage);
+  const paths = getPageNumbers(totalPages).map(pageNum => ({
+    params: { page: pageNum.toString() },
+    props: { sortedTeamMembers },
+  }));
+
+  return paths;
+}
+
+const { page } = Astro.params;
+const { sortedTeamMembers } = Astro.props;
+
+const currentPage = parseInt(page as string);
+const teamMembersPerPage = SITE.postPerPage || 9;
+const totalPages = Math.ceil(sortedTeamMembers.length / teamMembersPerPage);
+
+const lastMember = currentPage * teamMembersPerPage;
+const startMember = lastMember - teamMembersPerPage;
+
+const paginatedTeamMembers = sortedTeamMembers.slice(startMember, lastMember);
+
+// Group team members for current page
+// (This logic can be moved to the Team layout component if preferred)
+const groupedMembers = paginatedTeamMembers.reduce((acc, member) => {
+  const role = member.data.role;
+  if (!acc[role]) acc[role] = [];
+  acc[role].push(member);
+  return acc;
+}, {});
+
+const pagination = {
+  data: paginatedTeamMembers,
+  pageSize: teamMembersPerPage,
+  currentPage: currentPage,
+  lastPage: totalPages,
+  url: {
+    current: `/team/${currentPage}`,
+    prev: currentPage > 1 ? `/team/${currentPage - 1}` : null,
+    next: currentPage < totalPages ? `/team/${currentPage + 1}` : null,
+  },
+  start: startMember,
+  end: lastMember,
+  total: sortedTeamMembers.length,
+};
+
+// Pass both the pagination object and the grouped members
+const pageProps = { 
+  page: pagination,
+  teamMembers: paginatedTeamMembers
+};
+---
+
+<Team {...pageProps} />

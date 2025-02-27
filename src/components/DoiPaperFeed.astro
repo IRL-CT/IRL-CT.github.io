@@ -1,0 +1,240 @@
+---
+import LinkButton from "./LinkButton.astro";
+import { 
+  getAllCachedPublications,
+  getPublicationFromCache,
+  isPublicationCached
+} from "@utils/publicationCache.js";
+
+export interface Props {
+  dois: string[];
+  title?: string;
+  showViewAllLink?: boolean;
+  viewAllUrl?: string;
+  maxItems?: number;
+  className?: string;
+}
+
+const { 
+  dois, 
+  title = "Recent Publications",
+  showViewAllLink = true,
+  viewAllUrl = "/publications/",
+  maxItems = 5,
+  className = ""
+} = Astro.props;
+
+// Limit the number of DOIs to display
+const limitedDois = dois.slice(0, maxItems);
+
+// This function is only executed during build time!
+// It's safe to use here as it doesn't hit the API during user requests
+function getPublicationData(dois) {
+  const publications = [];
+  
+  for (const doi of dois) {
+    const cachedData = getPublicationFromCache(doi);
+    
+    if (cachedData) {
+      publications.push({
+        title: cachedData.title,
+        authors: cachedData.authors,
+        doi: cachedData.doi,
+        venue: cachedData.venue,
+        pubDate: cachedData.pubDate ? new Date(cachedData.pubDate) : null,
+        pubYear: cachedData.pubYear
+      });
+    } else {
+      // Fallback for publications not in cache
+      publications.push({
+        title: "Publication details loading...",
+        authors: "See DOI for details",
+        doi: doi,
+        venue: "",
+        pubDate: null,
+        pubYear: doi.match(/20\d\d/) ? doi.match(/20\d\d/)[0] : null
+      });
+      
+      // Log that this DOI is missing from cache during build
+      console.warn(`Publication cache miss for DOI: ${doi}`);
+    }
+  }
+  
+  // Sort publications by date (newest first)
+  return publications.sort((a, b) => {
+    // First by year
+    if (a.pubYear && b.pubYear && a.pubYear !== b.pubYear) {
+      return parseInt(b.pubYear) - parseInt(a.pubYear);
+    }
+    // Then by date if available
+    if (a.pubDate && b.pubDate) {
+      return b.pubDate.getTime() - a.pubDate.getTime();
+    }
+    return 0;
+  });
+}
+
+// Get publication data from cache
+const papers = getPublicationData(limitedDois);
+const hasMissingData = papers.some(p => p.title === "Publication details loading...");
+
+// Format date helper function
+function formatDate(date) {
+  if (!date) return "";
+  if (isNaN(date.getTime())) return "";
+  
+  return date.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short'
+  });
+}
+---
+
+<div class={`doi-paper-feed ${className}`}>
+  {title && <h2>{title}</h2>}
+  
+  {dois.length === 0 ? (
+    <p class="empty-message">No publications available.</p>
+  ) : (
+    <div>
+      <ul class="publication-list-home">
+        {papers.map(paper => (
+          <li class="publication-item-home" data-year={paper.pubYear}>
+            <h3>{paper.title}</h3>
+            <p class="publication-authors">{paper.authors}</p>
+            {paper.venue && <p class="publication-venue">{paper.venue}</p>}
+            <p class="publication-date">
+              {formatDate(paper.pubDate)}
+              {!paper.pubDate && paper.pubYear ? paper.pubYear : ""}
+            </p>
+            <a 
+              href={`https://doi.org/${paper.doi}`} 
+              class="publication-link"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              View Paper
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                <polyline points="15 3 21 3 21 9"></polyline>
+                <line x1="10" y1="14" x2="21" y2="3"></line>
+              </svg>
+            </a>
+          </li>
+        ))}
+      </ul>
+      {hasMissingData && (
+        <div class="info-message">
+          <p>Some publication data is being updated. Run <code>npm run update-publications</code> to refresh cache.</p>
+        </div>
+      )}
+    </div>
+  )}
+  
+  {showViewAllLink && dois.length > 0 && (
+    <div class="section-link">
+      <LinkButton href={viewAllUrl}>
+        All Publications
+        <svg xmlns="http://www.w3.org/2000/svg"
+          ><path
+            d="m11.293 17.293 1.414 1.414L19.414 12l-6.707-6.707-1.414 1.414L15.586 11H6v2h9.586z"
+          ></path>
+        </svg>
+      </LinkButton>
+    </div>
+  )}
+</div>
+
+<style>
+  .doi-paper-feed {
+    width: 100%;
+  }
+  
+  .doi-paper-feed h2 {
+    font-size: 1.8rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    color: rgb(var(--color-accent));
+  }
+  
+  .publication-list-home {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  
+  .publication-item-home {
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(var(--color-border), 0.8);
+  }
+  
+  .publication-item-home:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+  
+  .publication-item-home h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0 0 0.5rem;
+    line-height: 1.4;
+    color: rgb(var(--color-text-base));
+  }
+  
+  .publication-authors,
+  .publication-venue,
+  .publication-date {
+    font-size: 0.85rem;
+    margin: 0.25rem 0;
+    color: rgba(var(--color-text-base), 0.7);
+  }
+  
+  .publication-authors {
+    font-style: italic;
+  }
+  
+  .publication-link {
+    font-size: 0.85rem;
+    color: rgb(var(--color-accent));
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    margin-top: 0.5rem;
+    font-weight: 500;
+  }
+  
+  .publication-link:hover {
+    text-decoration: underline;
+  }
+  
+  .section-link {
+    text-align: center;
+    margin-top: 2rem;
+  }
+  
+  .empty-message,
+  .error-message,
+  .info-message {
+    text-align: center;
+    padding: 1rem 0;
+    color: rgba(var(--color-text-base), 0.8);
+    font-style: italic;
+    font-size: 0.9rem;
+  }
+  
+  .error-message {
+    color: #e53e3e;
+  }
+  
+  .info-message {
+    color: rgba(var(--color-text-base), 0.7);
+    background-color: rgba(var(--color-card-muted), 0.3);
+    padding: 0.75rem;
+    border-radius: 0.25rem;
+    margin-top: 1rem;
+  }
+</style>

@@ -1,0 +1,329 @@
+---
+import Layout from "@layouts/Layout.astro";
+import Header from "@components/Header.astro";
+import Footer from "@components/Footer.astro";
+import Pagination from "@components/Pagination.astro";
+import { SITE } from "@config";
+import type { CollectionEntry } from "astro:content";
+import type { Page } from "astro";
+
+export interface Props {
+  teamMembers: CollectionEntry<"team">[] | Page<CollectionEntry<"team">>;
+  title?: string;
+  description?: string;
+  page?: Page<CollectionEntry<"team">>;
+}
+
+const { 
+  teamMembers,
+  title = `Team | ${SITE.title}`,
+  description = "Meet our research team at the Cornell Interaction Design Research Lab (CIDRL).",
+  page
+} = Astro.props;
+
+// Detect whether we have pagination or a simple array
+const isPaginated = page !== undefined;
+const members = isPaginated ? page.data : teamMembers;
+
+// Group team members by role
+const groupedMembers = members.reduce((acc, member) => {
+  const role = member.data.role;
+  if (!acc[role]) acc[role] = [];
+  acc[role].push(member);
+  return acc;
+}, {} as Record<string, CollectionEntry<"team">[]>);
+
+// Define role hierarchy for sorting
+const roleOrder = [
+  "Lab Director",
+  "PhD Candidate",
+  "Professor",
+  "Associate Professor",
+  "Assistant Professor", 
+  "PhD Student", 
+  "Graduate Student", 
+  "Master's Student",
+  "Undergraduate Student", 
+  "Alumni",
+  "Collaborator"
+];
+
+// Sort roles based on predefined hierarchy
+const sortedRoles = Object.keys(groupedMembers).sort((a, b) => {
+  const aIndex = roleOrder.findIndex(role => a.includes(role));
+  const bIndex = roleOrder.findIndex(role => b.includes(role));
+  
+  // If role isn't in our predefined list, put it at the end
+  if (aIndex === -1 && bIndex === -1) return a.localeCompare(b);
+  if (aIndex === -1) return 1;
+  if (bIndex === -1) return -1;
+  
+  return aIndex - bIndex;
+});
+
+// Sort members within each role by name
+Object.keys(groupedMembers).forEach(role => {
+  groupedMembers[role].sort((a, b) => a.data.name.localeCompare(b.data.name));
+});
+---
+
+<Layout title={title} description={description}>
+  <Header activeNav="team" />
+  
+  <main id="main-content" class="team-container">
+    <h1>Our Team</h1>
+    <p class="team-description">
+      The CIDRL team consists of faculty, graduate students, and undergraduate researchers 
+      collaborating on cutting-edge research in human-computer interaction and interaction design.
+    </p>
+    
+    <div class="filters">
+      <h2>Filter by Role</h2>
+      <div class="filter-buttons">
+        <button class="filter-btn active" data-role="all">All</button>
+        {sortedRoles.map(role => (
+          <button class="filter-btn" data-role={role.toLowerCase().replace(/\s+/g, '-')}>
+            {role}
+          </button>
+        ))}
+      </div>
+    </div>
+    
+    <div class="team-members">
+      {sortedRoles.map(role => (
+        <div class="role-section" data-role-section={role.toLowerCase().replace(/\s+/g, '-')}>
+          <h2>{role}</h2>
+          <div class="members-grid">
+            {groupedMembers[role].map(member => (
+              <a href={`/team/${member.slug}/`} class="member-card">
+                <div class="member-avatar">
+                  {member.data.avatar ? (
+                    <img 
+                      src={member.data.avatar.src} 
+                      alt={`Photo of ${member.data.name}`} 
+                      loading="lazy"
+                    />
+                  ) : (
+                    <div class="avatar-placeholder">
+                      {member.data.name.charAt(0)}
+                    </div>
+                  )}
+                </div>
+                <div class="member-info">
+                  <h3>{member.data.name}</h3>
+                  <p class="member-role">{member.data.role}</p>
+                  {member.data.department && (
+                    <p class="member-department">{member.data.department}</p>
+                  )}
+                </div>
+              </a>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+    
+    {isPaginated && <Pagination page={page} />}
+  </main>
+
+  <Footer noMarginTop={isPaginated && page.lastPage > 1} />
+</Layout>
+
+<script>
+  // Filter functionality
+  document.addEventListener('DOMContentLoaded', () => {
+    const filterBtns = document.querySelectorAll('.filter-btn');
+    const roleSections = document.querySelectorAll('.role-section');
+    
+    filterBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        // Update active button
+        filterBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        
+        const selectedRole = btn.getAttribute('data-role');
+        
+        // Show all sections for "all" or only matching section
+        if (selectedRole === 'all') {
+          roleSections.forEach(section => {
+            section.style.display = 'block';
+          });
+        } else {
+          roleSections.forEach(section => {
+            if (section.getAttribute('data-role-section') === selectedRole) {
+              section.style.display = 'block';
+            } else {
+              section.style.display = 'none';
+            }
+          });
+        }
+      });
+    });
+  });
+</script>
+
+<style>
+  .team-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+  }
+  
+  h1 {
+    font-size: 2.5rem;
+    color: rgb(var(--color-accent));
+    margin-bottom: 1rem;
+  }
+  
+  .team-description {
+    font-size: 1.125rem;
+    line-height: 1.6;
+    margin-bottom: 3rem;
+    max-width: 800px;
+  }
+  
+  .filters {
+    margin-bottom: 2.5rem;
+  }
+  
+  .filters h2 {
+    font-size: 1.25rem;
+    margin-bottom: 0.75rem;
+    color: rgb(var(--color-accent));
+  }
+  
+  .filter-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  
+  .filter-btn {
+    background-color: rgba(var(--color-card), 0.5);
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 0.25rem;
+    cursor: pointer;
+    font-size: 0.875rem;
+    transition: all 0.2s ease;
+  }
+  
+  .filter-btn:hover {
+    background-color: rgba(var(--color-accent), 0.1);
+  }
+  
+  .filter-btn.active {
+    background-color: rgb(var(--color-accent));
+    color: white;
+  }
+  
+  .role-section {
+    margin-bottom: 3rem;
+  }
+  
+  .role-section h2 {
+    font-size: 1.8rem;
+    margin: 1rem 0 1.5rem;
+    color: rgb(var(--color-accent));
+    border-bottom: 2px solid rgba(var(--color-accent), 0.3);
+    padding-bottom: 0.5rem;
+  }
+  
+  .members-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1.5rem;
+  }
+  
+  .member-card {
+    display: flex;
+    flex-direction: column;
+    background-color: rgba(var(--color-card), 0.5);
+    border-radius: 0.5rem;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    text-decoration: none;
+    color: inherit;
+  }
+  
+  .member-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  }
+  
+  .member-avatar {
+    width: 100%;
+    height: 250px;
+    overflow: hidden;
+  }
+  
+  .member-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .avatar-placeholder {
+    width: 100%;
+    height: 100%;
+    background-color: rgba(var(--color-card-muted), 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    font-weight: 600;
+    color: rgba(var(--color-text-base), 0.6);
+  }
+  
+  .member-info {
+    padding: 1.25rem;
+  }
+  
+  .member-info h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0 0 0.5rem;
+  }
+  
+  .member-role {
+    font-size: 1rem;
+    color: rgb(var(--color-accent));
+    margin: 0 0 0.25rem;
+  }
+  
+  .member-department {
+    font-size: 0.875rem;
+    color: rgba(var(--color-text-base), 0.7);
+    margin: 0;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .members-grid {
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    }
+    
+    .member-avatar {
+      height: 200px;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .members-grid {
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    }
+    
+    .member-avatar {
+      height: 180px;
+    }
+    
+    .member-info {
+      padding: 1rem;
+    }
+    
+    .member-info h3 {
+      font-size: 1.1rem;
+    }
+  }
+</style>

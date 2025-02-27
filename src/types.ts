@@ -10,10 +10,11 @@ export type Site = {
   lightAndDarkMode: boolean;
   postPerIndex: number;
   postPerPage: number;
-  scheduledPostMargin: number;
+  projectsPerPage?: number; // Added for project pagination
+  scheduledPostMargin?: number;
   showArchives?: boolean;
   editPost?: {
-    url?: URL["href"];
+    url?: string;
     text?: string;
     appendFilePath?: boolean;
   };

@@ -1,0 +1,212 @@
+---
+import { getCollection } from "astro:content";
+import Layout from "@layouts/Layout.astro";
+import Header from "@components/Header.astro";
+import Footer from "@components/Footer.astro";
+import DoiPaperFeed from "@components/DoiPaperFeed.astro";
+
+// Get publications DOIs
+const publications = await getCollection("publications");
+const allDois = publications
+  .filter(pub => pub.data.doi)
+  .map(pub => pub.data.doi);
+
+// Additional metadata we can use from content files to avoid API rate limits
+const publicationsMeta = publications
+  .filter(pub => pub.data.doi)
+  .map(pub => ({
+    doi: pub.data.doi,
+    date: pub.data.manual_override?.publication_date,
+    featured: pub.data.featured
+  }));
+
+// Sort featured publications first, then by date if available
+const sortedDois = allDois.sort((a, b) => {
+  const metaA = publicationsMeta.find(p => p.doi === a);
+  const metaB = publicationsMeta.find(p => p.doi === b);
+  
+  // Sort featured first
+  if (metaA?.featured && !metaB?.featured) return -1;
+  if (!metaA?.featured && metaB?.featured) return 1;
+  
+  // Then sort by date if available
+  if (metaA?.date && metaB?.date) {
+    return new Date(metaB.date).getTime() - new Date(metaA.date).getTime();
+  }
+  
+  return 0;
+});
+
+// Create a static array of potential publication years
+// This gives users something to click on immediately without waiting for API
+const staticYears = Array.from({ length: new Date().getFullYear() - 2010 + 1 }, (_, i) => 
+  (new Date().getFullYear() - i).toString()
+);
+---
+
+<Layout title="Publications | Cornell Interaction Design Research Lab">
+  <Header activeNav="publications" />
+  <main id="main-content" class="publications-container">
+    <h1>Research Publications</h1>
+    <p class="page-description">
+      Our lab publishes research in top-tier HCI venues, including CHI, UIST, CSCW, and DIS,
+      as well as in specialized journals and conferences related to our areas of focus.
+    </p>
+
+    <div class="publications-wrapper">
+      <div class="publications-filters">
+        <h2>Filter By Year</h2>
+        <ul class="year-filter">
+          <li><a href="#all" class="year-link active" data-year="all">All Years</a></li>
+          {staticYears.slice(0, 10).map(year => (
+            <li><a href={`#${year}`} class="year-link" data-year={year}>{year}</a></li>
+          ))}
+        </ul>
+      </div>
+      
+      <div class="publications-feed">
+        <DoiPaperFeed 
+          dois={sortedDois} 
+          title="All Publications" 
+          showViewAllLink={false}
+          maxItems={100}
+          batchSize={2} // Reduce batch size to avoid rate limits
+          className="publications-complete-feed"
+        />
+      </div>
+    </div>
+  </main>
+  <Footer />
+</Layout>
+
+<script>
+  // Handle year filtering
+  document.addEventListener('DOMContentLoaded', () => {
+    const yearLinks = document.querySelectorAll('.year-link');
+    
+    // Add dynamic filtering by checking data-year attributes
+    function filterPublicationsByYear(year) {
+      const publications = document.querySelectorAll('.publication-item-home');
+      
+      publications.forEach(pub => {
+        const pubYear = pub.getAttribute('data-year');
+        if (year === 'all' || pubYear === year) {
+          pub.style.display = 'block';
+        } else {
+          pub.style.display = 'none';
+        }
+      });
+    }
+    
+    // Update active link and filter publications
+    yearLinks.forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        
+        // Update active state
+        yearLinks.forEach(l => l.classList.remove('active'));
+        link.classList.add('active');
+        
+        // Filter publications
+        const year = link.getAttribute('data-year');
+        filterPublicationsByYear(year);
+        
+        // Update URL hash
+        history.pushState(null, '', `#${year}`);
+      });
+    });
+    
+    // Handle initial hash on page load
+    if (location.hash) {
+      const year = location.hash.substring(1);
+      const yearLink = document.querySelector(`.year-link[data-year="${year}"]`);
+      if (yearLink) {
+        yearLink.click();
+      }
+    }
+  });
+</script>
+
+<style>
+  .publications-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+  }
+  
+  h1 {
+    font-size: 2.5rem;
+    color: rgb(var(--color-accent));
+    margin-bottom: 1rem;
+  }
+  
+  .page-description {
+    font-size: 1.125rem;
+    line-height: 1.6;
+    margin-bottom: 2.5rem;
+    max-width: 800px;
+  }
+  
+  .publications-wrapper {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+  
+  @media (min-width: 768px) {
+    .publications-wrapper {
+      grid-template-columns: 200px 1fr;
+    }
+  }
+  
+  .publications-filters {
+    margin-bottom: 1.5rem;
+  }
+  
+  .publications-filters h2 {
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+    color: rgb(var(--color-accent));
+  }
+  
+  .year-filter {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  
+  @media (min-width: 768px) {
+    .year-filter {
+      flex-direction: column;
+    }
+  }
+  
+  .year-link {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    border-radius: 0.25rem;
+    text-decoration: none;
+    color: rgb(var(--color-text-base));
+    background-color: rgba(var(--color-card), 0.5);
+    transition: all 0.2s ease;
+  }
+  
+  .year-link:hover {
+    background-color: rgba(var(--color-accent), 0.1);
+    text-decoration: none;
+  }
+  
+  .year-link.active {
+    background-color: rgb(var(--color-accent));
+    color: white;
+  }
+  
+  .publications-feed {
+    background-color: rgba(var(--color-card), 0.3);
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+  }
+</style>

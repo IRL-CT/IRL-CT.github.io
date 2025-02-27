@@ -1,0 +1,334 @@
+---
+import Layout from "@layouts/Layout.astro";
+import Header from "@components/Header.astro";
+import Footer from "@components/Footer.astro";
+import Tag from "@components/Tag.astro";
+import { getCollection } from "astro:content";
+import type { CollectionEntry } from "astro:content";
+import { slugifyStr } from "@utils/slugify";
+import ShareLinks from "@components/ShareLinks.astro";
+import { SITE } from "@config";
+import "@styles/projects.css";
+
+export interface Props {
+  project: CollectionEntry<"projects">;
+  projects: CollectionEntry<"projects">[];
+}
+
+const { project, projects } = Astro.props;
+
+// Extract data from the project
+const {
+  title,
+  summary,
+  status,
+  startDate,
+  endDate,
+  tags,
+  image,
+  teamMemberIds,
+  publicationIds,
+  fundingSource,
+  externalLink,
+} = project.data;
+
+let Content;
+try {
+  const rendered = await project.render();
+  Content = rendered.Content;
+} catch (error) {
+  console.error("Failed to render project content:", error);
+}
+
+// Get team members associated with this project using slugs
+let teamMembers = [];
+try {
+  if (teamMemberIds && Array.isArray(teamMemberIds)) {
+    const allTeamMembers = await getCollection("team");
+    teamMembers = allTeamMembers.filter(member => 
+      teamMemberIds.includes(member.slug)
+    );
+  }
+} catch (error) {
+  console.error("Error fetching team members:", error);
+}
+
+// Get publications associated with this project using slugs
+let publications = [];
+try {
+  if (publicationIds && Array.isArray(publicationIds)) {
+    const allPublications = await getCollection("publications");
+    publications = allPublications.filter(pub => 
+      publicationIds.includes(pub.slug)
+    );
+  }
+} catch (error) {
+  console.error("Error fetching publications:", error);
+}
+
+// Format date function with more robust parsing
+function formatDate(date) {
+  if (!date) return "Date unavailable";
+  
+  // Handle different date formats
+  const parsedDate = date instanceof Date ? date : new Date(date);
+  
+  // Check if the date is valid
+  if (isNaN(parsedDate.getTime())) {
+    console.warn(`Invalid date: ${date}`);
+    return "Date unavailable";
+  }
+  
+  return new Intl.DateTimeFormat('en-US', { 
+    year: 'numeric', 
+    month: 'long'
+  }).format(parsedDate);
+}
+
+// Helper to check if a value is valid and non-empty
+function isValid(value) {
+  if (value === null || value === undefined) return false;
+  if (Array.isArray(value)) return value.length > 0;
+  if (typeof value === 'string') return value.trim() !== '';
+  if (typeof value === 'object') return Object.keys(value).length > 0;
+  return true;
+}
+
+const ogImageUrl = image?.src || `/projects/${project.slug}.png`;
+const ogUrl = new URL(ogImageUrl, Astro.url.origin).href;
+
+const layoutProps = {
+  title: `${title} | ${SITE.title}`,
+  description: summary,
+  ogImage: ogUrl,
+  scrollSmooth: true,
+};
+---
+
+<Layout {...layoutProps}>
+  <Header />
+
+  <div class="project-container">
+    <div class="back-link">
+      <button
+        onclick="(() => (history.length === 1) ? window.location = '/projects' : history.back())()"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M19 12H5M12 19l-7-7 7-7"/>
+        </svg>
+        <span>Go back</span>
+      </button>
+    </div>
+    
+    <div class="project-header">
+      <div class="project-header-content">
+        {isValid(status) ? (
+          <div class="project-status-badge" data-status={status}>
+            {status}
+          </div>
+        ) : (
+          <div class="data-missing">Status not specified</div>
+        )}
+        
+        <h1 transition:name={slugifyStr(title)} class="project-title">
+          {title}
+        </h1>
+        
+        <p class="project-timeline">
+          {isValid(startDate) ? formatDate(startDate) : "Start date unknown"} 
+          — 
+          {isValid(endDate) ? formatDate(endDate) : "Present"}
+        </p>
+        
+        {isValid(summary) && (
+          <p class="project-summary">{summary}</p>
+        )}
+      </div>
+      
+      {isValid(image) && (
+        <div class="project-image">
+          <img src={image.src} alt={`${title || "Project"} image`} />
+        </div>
+      )}
+    </div>
+
+    <div class="project-content">
+      <div class="project-main">
+        <section class="project-description">
+          {Content ? (
+            <article id="article" class="project-article">
+              <Content />
+            </article>
+          ) : (
+            <div class="data-missing">No detailed description available for this project.</div>
+          )}
+        </section>
+        
+        {publications.length > 0 && (
+          <section class="project-publications">
+            <h2>Publications</h2>
+            <ul class="publication-list">
+              {publications.map(pub => (
+                <li class="publication-item">
+                  <h3>{pub.data.title}</h3>
+                  {pub.data.doi && (
+                    <p class="publication-doi">DOI: <a href={`https://doi.org/${pub.data.doi}`} target="_blank" rel="noopener noreferrer">{pub.data.doi}</a></p>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+      </div>
+      
+      <aside class="project-sidebar">
+        {isValid(tags) && (
+          <div class="project-tags">
+            <h3>Research Areas</h3>
+            <div class="tag-container">
+              {tags.map(tag => (
+                <span class="tag">{tag}</span>
+              ))}
+            </div>
+          </div>
+        )}
+        
+        {isValid(fundingSource) && (
+          <div class="project-funding">
+            <h3>Funding</h3>
+            <ul>
+              {fundingSource.map(source => <li>{source}</li>)}
+            </ul>
+          </div>
+        )}
+        
+        {isValid(teamMembers) && (
+          <div class="project-team">
+            <h3>Research Team</h3>
+            <ul class="team-list">
+              {teamMembers.map(member => (
+                <li class="team-member">
+                  <a href={`/team/${member.slug}/`} class="team-link">
+                    {member.data.avatar ? (
+                      <div class="member-avatar">
+                        <img src={member.data.avatar.src} alt={member.data.name} />
+                      </div>
+                    ) : (
+                      <div class="member-avatar placeholder-avatar">
+                        {member.data.name?.charAt(0) || "?"}
+                      </div>
+                    )}
+                    <div class="member-info">
+                      <span class="member-name">{member.data.name}</span>
+                      <span class="member-role">{member.data.role}</span>
+                    </div>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+        
+        {isValid(externalLink) && (
+          <div class="project-external-link">
+            <h3>External Resources</h3>
+            <a href={externalLink} target="_blank" rel="noopener noreferrer" class="external-button">
+              Project Website
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                <polyline points="15 3 21 3 21 9"></polyline>
+                <line x1="10" y1="14" x2="21" y2="3"></line>
+              </svg>
+            </a>
+          </div>
+        )}
+      </aside>
+    </div>
+    
+    <div class="page-footer">
+      <button id="back-to-top" class="back-to-top">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 15l-6-6-6 6"/>
+        </svg>
+        <span>Back to Top</span>
+      </button>
+
+      <ShareLinks />
+    </div>
+  </div>
+  
+  <Footer />
+</Layout>
+
+<script is:inline>
+  /** Create a progress indicator at the top */
+  function createProgressBar() {
+    // Create the main container div
+    const progressContainer = document.createElement("div");
+    progressContainer.className = "progress-container";
+
+    // Create the progress bar div
+    const progressBar = document.createElement("div");
+    progressBar.className = "progress-bar";
+    progressBar.id = "myBar";
+
+    // Append the progress bar to the progress container
+    progressContainer.appendChild(progressBar);
+
+    // Append the progress container to the document body
+    document.body.appendChild(progressContainer);
+  }
+  createProgressBar();
+
+  /** Update the progress bar when user scrolls */
+  function updateScrollProgress() {
+    document.addEventListener("scroll", () => {
+      const winScroll =
+        document.body.scrollTop || document.documentElement.scrollTop;
+      const height =
+        document.documentElement.scrollHeight -
+        document.documentElement.clientHeight;
+      const scrolled = (winScroll / height) * 100;
+      if (document) {
+        const myBar = document.getElementById("myBar");
+        if (myBar) {
+          myBar.style.width = scrolled + "%";
+        }
+      }
+    });
+  }
+  updateScrollProgress();
+
+  /** Attaches links to headings in the document */
+  function addHeadingLinks() {
+    const headings = Array.from(
+      document.querySelectorAll("h2, h3, h4, h5, h6")
+    );
+    for (const heading of headings) {
+      if (!heading.id) continue;
+      
+      heading.classList.add("heading-with-link");
+      const link = document.createElement("a");
+      link.className = "heading-link";
+      link.href = "#" + heading.id;
+
+      const span = document.createElement("span");
+      span.ariaHidden = "true";
+      span.innerText = "#";
+      link.appendChild(span);
+      heading.appendChild(link);
+    }
+  }
+  addHeadingLinks();
+
+  /** Back to top button functionality */
+  function backToTop() {
+    document.querySelector("#back-to-top")?.addEventListener("click", () => {
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+      });
+    });
+  }
+  backToTop();
+</script>
