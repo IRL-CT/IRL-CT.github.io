@@ -467,6 +467,57 @@ const layoutProps = {
   .details-link:hover {
     background-color: rgba(var(--color-card-muted), 0.8);
   }
+
+  /* Updated project image styling for vertical centering */
+  .project-header {
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 2rem;
+    margin-bottom: 3rem;
+  }
+  
+  .project-image {
+    width: 100%;
+    max-height: 500px;
+    overflow: hidden;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+  
+  .project-image img {
+    width: 100%;
+    height: auto;
+    max-height: 500px;
+    object-fit: contain;
+    object-position: center;
+  }
+  
+  @media (min-width: 768px) {
+    .project-header {
+      flex-direction: row;
+      align-items: center; /* Change from flex-start to center for vertical alignment */
+    }
+    
+    .project-header-content {
+      flex: 1;
+    }
+    
+    .project-image {
+      flex: 1;
+      max-width: 50%;
+      align-self: center; /* Ensure image container is centered */
+    }
+  }
+  
+  @media (min-width: 1024px) {
+    .project-image {
+      max-height: 600px; /* Even taller on larger screens */
+    }
+    
+    .project-image img {
+      max-height: 600px;
+    }
+  }
 </style>
 
 <script is:inline>

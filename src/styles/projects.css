@@ -93,11 +93,6 @@
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
 }
 
-.project-image {
-  position: relative;
-  height: 180px;
-  overflow: hidden;
-}
 
 .project-image img {
   width: 100%;
@@ -222,11 +217,6 @@
 .project-card:hover {
   transform: translateY(-0.25rem);
   box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
-}
-
-.project-image {
-  height: 12rem;
-  overflow: hidden;
 }
 
 .project-image img {

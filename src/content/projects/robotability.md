@@ -7,4 +7,5 @@ teamMemberIds: ["matt", "teresa", "frank", "wendy"]
 publicationIds: ["robotability"]
 status: "ongoing"
 image: "assets/projects/robotability.png"
+externalLink: "https://robotability.cornell.edu"
 ---
