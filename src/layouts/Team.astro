@@ -73,8 +73,7 @@ Object.keys(groupedMembers).forEach(role => {
   <main id="main-content" class="team-container">
     <h1>Our Team</h1>
     <p class="team-description">
-      The CIDRL team consists of faculty, graduate students, and undergraduate researchers 
-      collaborating on cutting-edge research in human-computer interaction and interaction design.
+      The CIDRL team, directed by Associate Wendy Ju, consists of doctoral students, interns, and visting researchers. The CIDRL lab is based at Cornell Tech, in New York City.
     </p>
     
     <div class="filters">
@@ -129,37 +128,74 @@ Object.keys(groupedMembers).forEach(role => {
   <Footer noMarginTop={isPaginated && page.lastPage > 1} />
 </Layout>
 
-<script>
-  // Filter functionality
-  document.addEventListener('DOMContentLoaded', () => {
-    const filterBtns = document.querySelectorAll('.filter-btn');
-    const roleSections = document.querySelectorAll('.role-section');
+<script is:inline>
+  // IMMEDIATELY EXECUTED SCRIPT - guaranteed to run
+  (function() {
+    console.warn("🚀 TEAM FILTER SCRIPT RUNNING");
     
-    filterBtns.forEach(btn => {
-      btn.addEventListener('click', () => {
-        // Update active button
-        filterBtns.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        
-        const selectedRole = btn.getAttribute('data-role');
-        
-        // Show all sections for "all" or only matching section
-        if (selectedRole === 'all') {
-          roleSections.forEach(section => {
-            section.style.display = 'block';
+    // Wait for DOM to be ready
+    function initFilters() {
+      console.warn("📋 INITIALIZING TEAM FILTERS");
+      
+      // Get all filter buttons and role sections
+      var filterBtns = document.querySelectorAll('.filter-btn');
+      var roleSections = document.querySelectorAll('.role-section');
+      
+      console.warn("🔍 FOUND ELEMENTS:", {
+        "Filter buttons": filterBtns.length,
+        "Role sections": roleSections.length
+      });
+      
+      // Debug info - what do we have to work with?
+      Array.from(filterBtns).forEach(function(btn) {
+        console.log("Button:", btn.textContent.trim(), "data-role:", btn.getAttribute('data-role'));
+      });
+      
+      Array.from(roleSections).forEach(function(section) {
+        console.log("Section:", section.querySelector('h2').textContent.trim(), 
+                   "data-role-section:", section.getAttribute('data-role-section'));
+      });
+      
+      // Add click handlers to each button
+      filterBtns.forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          var role = this.getAttribute('data-role');
+          console.warn("👆 CLICKED:", role);
+          
+          // Update active button
+          filterBtns.forEach(function(b) { 
+            b.classList.remove('active'); 
           });
-        } else {
-          roleSections.forEach(section => {
-            if (section.getAttribute('data-role-section') === selectedRole) {
+          this.classList.add('active');
+          
+          // Show/hide sections based on role
+          roleSections.forEach(function(section) {
+            var sectionRole = section.getAttribute('data-role-section');
+            
+            if (role === 'all') {
               section.style.display = 'block';
+              console.log("SHOWING ALL:", section.querySelector('h2').textContent);
+            } else if (sectionRole === role) {
+              section.style.display = 'block';
+              console.log("SHOWING:", sectionRole);
             } else {
               section.style.display = 'none';
+              console.log("HIDING:", sectionRole);
             }
           });
-        }
+        });
       });
-    });
-  });
+      
+      console.warn("✅ TEAM FILTERS INITIALIZED");
+    }
+    
+    // Execute when DOM is loaded
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initFilters);
+    } else {
+      initFilters();
+    }
+  })();
 </script>
 
 <style>

@@ -3,8 +3,8 @@ import type { Site, SocialObjects } from "./types";
 export const SITE: Site = {
   website: "https://astro-paper.pages.dev/", // replace this with your deployed domain
   author: "CIDRL",
-  profile: "CIDRL",
-  desc: "A minimal, responsive and SEO-friendly Astro blog theme.",
+  profile: "Cornell Interaction Design Research Lab",
+  desc: "Cornell Interaction Design Research Lab",
   title: "CIDRL",
   ogImage: "astropaper-og.jpg",
   lightAndDarkMode: true,
@@ -26,10 +26,10 @@ export const LOCALE = {
 } as const;
 
 export const LOGO_IMAGE = {
-  enable: false,
-  svg: true,
-  width: 216,
-  height: 46,
+  enable: true,
+  svg: false,
+  width: 250,
+  height: 150,
 };
 
 export const SOCIALS: SocialObjects = [

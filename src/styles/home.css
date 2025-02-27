@@ -112,12 +112,19 @@
 .project-image {
   height: 200px;
   overflow: hidden;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f8f8f8;
 }
 
 .project-image img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain; /* Changed from 'cover' to 'contain' */
+  max-height: 100%;
+  background-color: #f8f8f8; /* Light background for images with transparency */
 }
 
 .project-image-placeholder {
@@ -159,10 +166,17 @@
   font-weight: 600;
 }
 
-.project-card p {
+.project-card p:not(.project-dates) {
   color: var(--color-text-muted);
   font-size: 0.95rem;
   line-height: 1.5;
+  /* Add text truncation */
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-height: 4.5em; /* Approximately 3 lines of text */
 }
 
 /* Add responsive styles for larger screens */
@@ -174,6 +188,7 @@
   .project-image {
     flex: 0 0 250px;
     height: auto;
+    min-height: 180px;
   }
   
   .project-card-content {
@@ -182,4 +197,72 @@
     flex-direction: column;
     justify-content: center;
   }
+}
+
+/* Team members section */
+.team-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 1.5rem;
+  margin: 2rem 0;
+}
+
+.team-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.2s ease;
+}
+
+.team-card:hover {
+  transform: translateY(-4px);
+}
+
+.member-avatar {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1/1;
+  overflow: hidden;
+  border-radius: 8px; /* Changed from circular to slightly rounded */
+  margin-bottom: 0.75rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.member-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.avatar-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #e2e8f0;
+  color: #64748b;
+  font-size: 2rem;
+  font-weight: 600;
+  border-radius: 8px; /* Make sure placeholder follows same border radius */
+}
+
+.member-info {
+  text-align: center;
+  width: 100%;
+}
+
+.member-info h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0 0 0.25rem 0;
+  line-height: 1.3;
+}
+
+.member-info p {
+  font-size: 0.85rem;
+  color: var(--color-text-muted, #64748b);
+  margin: 0;
 }

@@ -46,85 +46,276 @@ const staticYears = Array.from({ length: new Date().getFullYear() - 2010 + 1 }, 
 
 <Layout title="Publications | Cornell Interaction Design Research Lab">
   <Header activeNav="publications" />
-  <main id="main-content" class="publications-container">
-    <h1>Research Publications</h1>
-    <p class="page-description">
-      Our lab publishes research in top-tier HCI venues, including CHI, UIST, CSCW, and DIS,
-      as well as in specialized journals and conferences related to our areas of focus.
-    </p>
+  <div class="mx-auto max-w-6xl">
+    <main id="main-content" class="publications-container">
+      <h1>Research Publications</h1>
+      <p class="page-description">
+        Our lab publishes research in top-tier HCI venues, including CHI, UIST, CSCW, and DIS,
+        as well as in specialized journals and conferences related to our areas of focus.
+      </p>
 
-    <div class="publications-wrapper">
-      <div class="publications-filters">
-        <h2>Filter By Year</h2>
-        <ul class="year-filter">
-          <li><a href="#all" class="year-link active" data-year="all">All Years</a></li>
-          {staticYears.slice(0, 10).map(year => (
-            <li><a href={`#${year}`} class="year-link" data-year={year}>{year}</a></li>
-          ))}
-        </ul>
+      <div class="publications-wrapper">
+        <aside class="publications-filters">
+          <div class="filters-inner">
+            <h2>Filter By Year</h2>
+            <ul class="year-filter">
+              <li><a href="#all" class="year-link active" data-year="all">All Years</a></li>
+              {staticYears.slice(0, 10).map(year => (
+                <li><a href={`#${year}`} class="year-link" data-year={year}>{year}</a></li>
+              ))}
+            </ul>
+          </div>
+        </aside>
+        
+        <div class="publications-feed">
+          <DoiPaperFeed 
+            dois={sortedDois} 
+            title="All Publications" 
+            showViewAllLink={false}
+            maxItems={100}
+            batchSize={2} // Reduce batch size to avoid rate limits
+            className="publications-complete-feed"
+          />
+        </div>
       </div>
-      
-      <div class="publications-feed">
-        <DoiPaperFeed 
-          dois={sortedDois} 
-          title="All Publications" 
-          showViewAllLink={false}
-          maxItems={100}
-          batchSize={2} // Reduce batch size to avoid rate limits
-          className="publications-complete-feed"
-        />
-      </div>
-    </div>
-  </main>
+    </main>
+  </div>
   <Footer />
 </Layout>
 
 <script>
-  // Handle year filtering
-  document.addEventListener('DOMContentLoaded', () => {
+  // Enhanced publication filtering with hash change support
+  function setupPublicationFilters() {
+    console.log("Setting up publication filters");
     const yearLinks = document.querySelectorAll('.year-link');
+    const publicationsFeed = document.querySelector('.publications-complete-feed');
+    let initialFilterApplied = false;
     
-    // Add dynamic filtering by checking data-year attributes
-    function filterPublicationsByYear(year) {
+    // Debug helper - log number of publications found
+    function logPublicationsStatus() {
       const publications = document.querySelectorAll('.publication-item-home');
-      
-      publications.forEach(pub => {
-        const pubYear = pub.getAttribute('data-year');
-        if (year === 'all' || pubYear === year) {
-          pub.style.display = 'block';
-        } else {
-          pub.style.display = 'none';
-        }
-      });
+      console.log(`Found ${publications.length} publications`);
     }
     
-    // Update active link and filter publications
+    // More robust year extraction
+    function extractYearFromPublication(pubElement) {
+      // First try data attribute
+      if (pubElement.dataset.year) {
+        return pubElement.dataset.year;
+      }
+      
+      // Then try the date text node
+      const dateElement = pubElement.querySelector('.publication-date');
+      if (dateElement) {
+        const dateText = dateElement.textContent.trim();
+        
+        // Extract last 4 digits that look like a year (2010-2030)
+        const yearMatch = dateText.match(/\b(20[1-3][0-9])\b/);
+        if (yearMatch) {
+          return yearMatch[0];
+        }
+      }
+      
+      // Finally check the DOI itself for a year pattern
+      const linkElement = pubElement.querySelector('a[href*="doi.org"]');
+      if (linkElement) {
+        const doiMatch = linkElement.href.match(/\b(20[1-3][0-9])\b/);
+        if (doiMatch) {
+          return doiMatch[0];
+        }
+      }
+      
+      return null;
+    }
+    
+    // Filter publications by year
+    function filterPublicationsByYear(year) {
+      console.log(`Filtering by year: ${year}`);
+      const publications = document.querySelectorAll('.publication-item-home');
+      if (publications.length === 0) {
+        console.log("No publications found to filter");
+        return false;
+      }
+      
+      let visibleCount = 0;
+      
+      publications.forEach(pub => {
+        const pubYear = extractYearFromPublication(pub);
+        
+        // Store the year as data attribute for future filtering
+        if (pubYear && !pub.dataset.year) {
+          pub.dataset.year = pubYear;
+        }
+        
+        if (year === 'all' || pubYear === year) {
+          pub.style.visibility = '';
+          pub.style.display = '';
+          pub.style.height = '';
+          pub.style.margin = '';
+          pub.style.paddingBottom = '';
+          pub.style.borderBottom = '';
+          visibleCount++;
+        } else {
+          // Use visibility:hidden instead of display:none to maintain layout
+          pub.style.visibility = 'hidden';
+          pub.style.height = '0';
+          pub.style.margin = '0';
+          pub.style.paddingBottom = '0';
+          pub.style.borderBottom = 'none';
+        }
+      });
+      
+      console.log(`Showing ${visibleCount} of ${publications.length} publications`);
+      
+      // Show a message if no publications match the filter
+      const noResultsMessage = document.querySelector('.no-results-message') || 
+        (() => {
+          const msg = document.createElement('p');
+          msg.className = 'no-results-message';
+          msg.textContent = 'No publications found for this year.';
+          msg.style.textAlign = 'center';
+          msg.style.padding = '1rem';
+          msg.style.fontStyle = 'italic';
+          publicationsFeed?.appendChild(msg);
+          return msg;
+        })();
+      
+      noResultsMessage.style.display = visibleCount === 0 ? 'block' : 'none';
+      return true;
+    }
+    
+    // Find and activate the correct year link
+    function activateYearLink(year) {
+      const yearLink = document.querySelector(`.year-link[data-year="${year}"]`);
+      if (yearLink) {
+        yearLinks.forEach(l => l.classList.remove('active'));
+        yearLink.classList.add('active');
+        return true;
+      }
+      return false;
+    }
+    
+    // Apply initial filter based on URL hash
+    function applyFilterFromHash() {
+      const year = location.hash ? location.hash.substring(1) : 'all';
+      console.log(`Applying filter from hash: ${year}`);
+      
+      // Activate the corresponding year link
+      activateYearLink(year);
+      
+      // Try to filter publications
+      return filterPublicationsByYear(year);
+    }
+    
+    // Try to apply initial filter when publications are loaded
+    function tryApplyInitialFilter() {
+      if (initialFilterApplied) return;
+      
+      const publications = document.querySelectorAll('.publication-item-home');
+      if (publications.length === 0) {
+        console.log("No publications found yet, waiting...");
+        return;
+      }
+      
+      const success = applyFilterFromHash();
+      if (success) {
+        initialFilterApplied = true;
+        console.log("Initial filter applied successfully");
+      }
+    }
+    
+    // Update active link and filter publications when clicking a year link
     yearLinks.forEach(link => {
       link.addEventListener('click', (e) => {
         e.preventDefault();
+        
+        const year = link.getAttribute('data-year');
+        console.log(`Year link clicked: ${year}`);
         
         // Update active state
         yearLinks.forEach(l => l.classList.remove('active'));
         link.classList.add('active');
         
         // Filter publications
-        const year = link.getAttribute('data-year');
         filterPublicationsByYear(year);
         
-        // Update URL hash
-        history.pushState(null, '', `#${year}`);
+        // Update URL hash without triggering hashchange
+        history.pushState(null, '', year === 'all' ? '#all' : `#${year}`);
       });
     });
     
-    // Handle initial hash on page load
-    if (location.hash) {
-      const year = location.hash.substring(1);
-      const yearLink = document.querySelector(`.year-link[data-year="${year}"]`);
-      if (yearLink) {
-        yearLink.click();
+    // Handle hash changes (browser back/forward navigation)
+    window.addEventListener('hashchange', () => {
+      console.log("Hash changed:", location.hash);
+      applyFilterFromHash();
+    });
+    
+    // Method 1: Watch for DOM changes to detect when publications are loaded
+    const observer = new MutationObserver(mutations => {
+      let shouldCheck = false;
+      
+      for (const mutation of mutations) {
+        if (mutation.addedNodes.length > 0) {
+          shouldCheck = true;
+          break;
+        }
       }
+      
+      if (shouldCheck) {
+        console.log("DOM changed, checking for publications...");
+        logPublicationsStatus();
+        tryApplyInitialFilter();
+      }
+    });
+    
+    if (publicationsFeed) {
+      observer.observe(publicationsFeed, { 
+        childList: true, 
+        subtree: true,
+        characterData: true
+      });
     }
-  });
+    
+    // Method 2: Periodically check for publications as a fallback
+    const checkInterval = setInterval(() => {
+      console.log("Interval check running...");
+      const publications = document.querySelectorAll('.publication-item-home');
+      if (publications.length > 0) {
+        logPublicationsStatus();
+        tryApplyInitialFilter();
+        
+        if (initialFilterApplied) {
+          console.log("Filter applied, clearing interval");
+          clearInterval(checkInterval);
+        }
+      }
+    }, 500);
+    
+    // Clean up interval after 20 seconds to prevent infinite checking
+    setTimeout(() => {
+      if (checkInterval) {
+        console.log("Clearing interval after timeout");
+        clearInterval(checkInterval);
+      }
+    }, 20000);
+    
+    // Method 3: Try immediately in case publications are already loaded
+    console.log("Trying initial filter immediately");
+    tryApplyInitialFilter();
+    
+    // Method 4: Listen for a custom event from DoiPaperFeed
+    document.addEventListener('publications-loaded', (e) => {
+      console.log("publications-loaded event received");
+      setTimeout(tryApplyInitialFilter, 100); // Small delay to ensure DOM is updated
+    });
+    
+    // Log initial status
+    logPublicationsStatus();
+  }
+  
+  // Run the setup immediately and also when DOM is ready
+  setupPublicationFilters();
+  document.addEventListener('DOMContentLoaded', setupPublicationFilters);
 </script>
 
 <style>
@@ -149,14 +340,27 @@ const staticYears = Array.from({ length: new Date().getFullYear() - 2010 + 1 }, 
   
   .publications-wrapper {
     display: grid;
-    grid-template-columns: 1fr;
+    grid-template-columns: 200px minmax(0, 1fr);
     gap: 2rem;
+    position: relative;
   }
   
-  @media (min-width: 768px) {
+  @media (max-width: 768px) {
     .publications-wrapper {
-      grid-template-columns: 200px 1fr;
+      grid-template-columns: 1fr;
     }
+  }
+  
+  .publications-filters {
+    width: 200px;
+  }
+  
+  .filters-inner {
+    position: sticky;
+    top: 2rem;
+    max-height: calc(100vh - 8rem);
+    overflow-y: auto;
+    width: 200px;
   }
   
   .publications-filters {
@@ -208,5 +412,10 @@ const staticYears = Array.from({ length: new Date().getFullYear() - 2010 + 1 }, 
     background-color: rgba(var(--color-card), 0.3);
     border-radius: 0.5rem;
     padding: 1.5rem;
+    min-height: 500px;
+    width: 100%;
+    min-width: 0;
   }
+  
+
 </style>

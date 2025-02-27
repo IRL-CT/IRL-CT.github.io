@@ -1,6 +1,7 @@
 ---
 import Hr from "./Hr.astro";
 import Socials from "./Socials.astro";
+import { SITE, LOGO_IMAGE } from "../config";
 
 const currentYear = new Date().getFullYear();
 
@@ -12,13 +13,30 @@ const { noMarginTop = false } = Astro.props;
 ---
 
 <footer class={`${noMarginTop ? "" : "mt-auto"}`}>
-  <Hr noPadding />
-  <div class="footer-wrapper">
-    <Socials centered />
-    <div class="copyright-wrapper">
-      <span>Copyright &#169; {currentYear} CIDRL </span>
-      <span class="separator">&nbsp;|&nbsp;</span>
-      <span>All rights reserved.</span>
+  <div class="max-w-5xl mx-auto px-4 py-4 main-footer">
+    <Hr noPadding />
+    <div class="footer-wrapper">
+      <Socials centered />
+      <div class="copyright-wrapper">
+        <span>Copyright &#169; {currentYear} CIDRL </span>
+        <span class="separator">&nbsp;|&nbsp;</span>
+        <span>All rights reserved.</span>
+      </div>
+      <div class="logo-wrapper">
+      {
+        LOGO_IMAGE.enable ? (
+          <img
+            src={`/assets/${LOGO_IMAGE.svg ? "logo.svg" : "logo.png"}`}
+            class=""
+            alt={SITE.title}
+            width={LOGO_IMAGE.width}
+            height={LOGO_IMAGE.height}
+          />
+        ) : (
+          SITE.title
+        )
+      }
+      </div>
     </div>
   </div>
 </footer>

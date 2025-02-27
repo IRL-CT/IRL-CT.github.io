@@ -27,6 +27,9 @@
 /* Team member header */
 .team-member-header {
   display: grid;
+  margin-left: 3rem;
+  margin-top: 3rem;
+  margin-right: auto;
   grid-template-columns: 1fr;
   gap: 2rem;
   margin-bottom: 3rem;
@@ -143,9 +146,8 @@
 
 /* Main content layout */
 .member-content {
-  display: grid;
   grid-template-columns: 1fr;
-  gap: 3rem;
+  gap: 2rem;
 }
 
 @media (min-width: 768px) {
@@ -195,6 +197,7 @@
   display: grid;
   grid-template-columns: 1fr;
   gap: 1.5rem;
+  margin-top: 1.5rem;
 }
 
 @media (min-width: 640px) {
@@ -213,6 +216,7 @@
   color: inherit;
   display: flex;
   flex-direction: column;
+  height: 100%;
 }
 
 .project-card:hover {
@@ -229,6 +233,11 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.project-card:hover .project-image img {
+  transform: scale(1.05);
 }
 
 .project-content {
@@ -255,13 +264,18 @@
 }
 
 .project-status-badge[data-status="completed"] {
-  background-color: #dbe7f6;
-  color: #2563eb;
+  background-color: var(--color-neutral-100);
+  color: var(--color-neutral-800);
 }
 
 .project-status-badge[data-status="planned"] {
-  background-color: #fef3c7;
-  color: #92400e;
+  background-color: var(--color-info-100);
+  color: var(--color-info-800);
+}
+
+.project-status-badge[data-status="active"] {
+  background-color: var(--color-success-100);
+  color: var(--color-success-900);
 }
 
 .project-title {
@@ -269,6 +283,15 @@
   font-weight: 600;
   margin: 0 0 0.75rem;
   line-height: 1.3;
+}
+
+/* Add line clamping for project summaries */
+.project-summary {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .project-summary {

@@ -56,15 +56,90 @@ const sortedTeamMembers = teamMembers
   });
 
 // Get top 6 team members after sorting
-const displayTeamMembers = sortedTeamMembers.slice(0, 18);
+const displayTeamMembers = sortedTeamMembers.slice(0, 12);
 
-// Get publications DOIs directly without needing to sort here
-// The DoiPaperFeed component will handle sorting by date from the metadata
+// Get publications with improved sorting logic to guarantee newest papers appear
 const publications = await getCollection("publications");
-const dois = publications
+
+// Log publication dates to help debug
+console.log("Available publication dates:");
+publications.forEach(pub => {
+  const date = pub.data.manual_override?.publication_date || 
+               pub.data.publicationDate || 
+               pub.data.date;
+  if (date) {
+    console.log(`${pub.data.doi}: ${date}`);
+  }
+});
+
+// Extract year from various date formats
+function getPublicationYear(pub) {
+  const dateStr = pub.data.manual_override?.publication_date || 
+                 pub.data.publicationDate || 
+                 pub.data.date;
+  
+  if (dateStr) {
+    // Try to extract year from date string
+    const yearMatch = dateStr.match(/\b(20\d\d)\b/);
+    if (yearMatch) return yearMatch[0];
+  }
+  
+  // Fall back to DOI-based year extraction
+  if (pub.data.doi) {
+    const doiYearMatch = pub.data.doi.match(/\b(20\d\d)\b/);
+    if (doiYearMatch) return doiYearMatch[0];
+  }
+  
+  return null;
+}
+
+// Sort publications: newest first, with featured at the top
+const sortedPubs = publications
   .filter(pub => pub.data.doi)
-  .slice(0, 10) // Get a few more than we need in case some fail to load
-  .map(pub => pub.data.doi);
+  .map(pub => ({
+    doi: pub.data.doi,
+    featured: pub.data.featured || false,
+    year: getPublicationYear(pub),
+    dateObj: (() => {
+      const dateStr = pub.data.manual_override?.publication_date || 
+                     pub.data.publicationDate || 
+                     pub.data.date;
+      if (dateStr) {
+        try {
+          return new Date(dateStr);
+        } catch (e) {
+          return null;
+        }
+      }
+      return null;
+    })()
+  }))
+  .sort((a, b) => {
+    // Featured publications first
+    if (a.featured && !b.featured) return -1;
+    if (!a.featured && b.featured) return 1;
+    
+    // Then by explicit year if available
+    if (a.year && b.year && a.year !== b.year) {
+      return parseInt(b.year) - parseInt(a.year);
+    }
+    
+    // Then by date object if available
+    if (a.dateObj && b.dateObj && !isNaN(a.dateObj) && !isNaN(b.dateObj)) {
+      return b.dateObj.getTime() - a.dateObj.getTime();
+    }
+    
+    return 0;
+  });
+
+// Now extract just the DOIs
+const sortedDois = sortedPubs.map(pub => pub.doi);
+
+// Log the final sort order to help debug
+console.log("Publication sort order on home page:");
+sortedPubs.slice(0, 10).forEach((pub, i) => {
+  console.log(`${i+1}. ${pub.doi} - Year: ${pub.year} - Featured: ${pub.featured}`);
+});
 
 const socialCount = SOCIALS.filter(social => social.active).length;
 
@@ -86,18 +161,15 @@ function formatDate(date) {
   <main id="main-content" class="cidrl-main">
     <section id="hero" class="cidrl-hero">
       <div class="hero-content">
-        <h1>Cornell Interaction Design Research Lab</h1>
+        <h1>Cornell <strong>Interaction Design</strong> Research Lab</h1>
         <p class="hero-tagline">
-          Advancing the frontiers of human-computer interaction through innovative research and design
+          Designing interactions with exploratory, frontier methods and extracting insights about interaction using cutting-edge computational methods.
         </p>
         <p class="hero-description">
-          The Cornell Interaction Design Research Lab (CIDRL) explores the intersection of human behavior, 
-          technology, and design to create more intuitive, accessible, and meaningful interactive experiences.
+          The Cornell Interaction Design Research Lab explores the intersection of human behavior, 
+          technology, and design to create more intuitive, accessible, and meaningful interactions at all scales, from face-to-face encounters to city-scale phenomena.
         </p>
         <div class="hero-buttons">
-          <a href="/about/" class="primary-button">
-            About Us
-          </a>
           <a href="/projects/" class="secondary-button">
             View Projects
           </a>
@@ -115,7 +187,6 @@ function formatDate(date) {
       </div>
     </section>
 
-    <Hr />
 
     <div class="main-with-sidebar-layout">
       <div class="main-content">
@@ -155,7 +226,6 @@ function formatDate(date) {
           </div>
         </section>
 
-        <Hr />
 
         <section id="team-members">
           <h2>Research Team</h2>
@@ -163,18 +233,20 @@ function formatDate(date) {
             {
               displayTeamMembers.map(member => (
                 <a href={`/team/${member.slug}/`} class="team-card">
-                  <div class="member-avatar">
-                    {member.data.avatar ? (
+                  {member.data.avatar ? (
+                    <div class="member-avatar">
                       <img 
                         src={member.data.avatar.src} 
                         alt={`Photo of ${member.data.name}`} 
                       />
-                    ) : (
+                    </div>
+                  ) : (
+                    <div class="member-avatar">
                       <div class="avatar-placeholder">
                         {member.data.name.charAt(0)}
                       </div>
-                    )}
-                  </div>
+                    </div>
+                  )}
                   <div class="member-info">
                     <h3>{member.data.name}</h3>
                     <p>{member.data.role}</p>
@@ -186,10 +258,8 @@ function formatDate(date) {
           <div class="section-link">
             <LinkButton href="/team/">
               View Full Team
-              <svg xmlns="http://www.w3.org/2000/svg"
-                ><path
-                  d="m11.293 17.293 1.414 1.414L19.414 12l-6.707-6.707-1.414 1.414L15.586 11H6v2h9.586z"
-                ></path>
+              <svg xmlns="http://www.w3.org/2000/svg">
+                <path d="m11.293 17.293 1.414 1.414L19.414 12l-6.707-6.707-1.414 1.414L15.586 11H6v2h9.586z"></path>
               </svg>
             </LinkButton>
           </div>
@@ -208,10 +278,10 @@ function formatDate(date) {
       <div class="sidebar">
         <aside class="publications-sidebar">
           <DoiPaperFeed 
-            dois={dois} 
+            dois={sortedDois} 
             title="Recent Publications" 
             viewAllUrl="/publications/"
-            maxItems={5}
+            maxItems={6}  <!-- Increased from 5 to 6 to ensure newest are visible -->
           />
         </aside>
       </div>

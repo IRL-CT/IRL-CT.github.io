@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2025-02-27T05:51:45.710Z",
+  "lastUpdated": "2025-02-27T08:31:03.711Z",
   "publications": {
     "10.1145/3173574.3173739": {
       "doi": "10.1145/3173574.3173739",
@@ -54,6 +54,15 @@
       "pubDate": "2023-06-12T04:00:00.000Z",
       "pubYear": "2023",
       "fetchedAt": "2025-02-27T05:51:45.710Z"
+    },
+    "10.1080/17549175.2022.2111591": {
+      "doi": "10.1080/17549175.2022.2111591",
+      "title": "The sidewalk ballet in the age of social distancing: interactive geospatial mapping to study NYC’s pandemic urbanism",
+      "authors": "Sharon Yavo-Ayalon, Cheng Gong, Harrison Yu, Ilan Mandel, Wendy Ju",
+      "venue": "Journal of Urbanism: International Research on Placemaking and Urban Sustainability",
+      "pubDate": "2022-08-18T04:00:00.000Z",
+      "pubYear": "2022",
+      "fetchedAt": "2025-02-27T08:31:03.649Z"
     }
   }
 }

@@ -9,6 +9,8 @@ import { slugifyStr } from "@utils/slugify";
 import ShareLinks from "@components/ShareLinks.astro";
 import { SITE } from "@config";
 import "@styles/projects.css";
+import fs from 'node:fs/promises';
+import path from 'node:path';
 
 export interface Props {
   project: CollectionEntry<"projects">;
@@ -53,6 +55,17 @@ try {
   console.error("Error fetching team members:", error);
 }
 
+// Load publications cache data
+let publicationsCache = {};
+try {
+  const cachePath = path.join(process.cwd(), 'public', 'data', 'publications-cache.json');
+  const cacheContent = await fs.readFile(cachePath, 'utf-8');
+  const cacheData = JSON.parse(cacheContent);
+  publicationsCache = cacheData.publications || {};
+} catch (error) {
+  console.error("Error loading publications cache:", error);
+}
+
 // Get publications associated with this project using slugs
 let publications = [];
 try {
@@ -61,6 +74,43 @@ try {
     publications = allPublications.filter(pub => 
       publicationIds.includes(pub.slug)
     );
+    
+    // Enhance publication data with cache information when available
+    publications = publications.map(pub => {
+      // Create an enhanced data object
+      const enhancedData = { ...pub.data };
+      
+      // If we have a DOI and cache data for this publication
+      if (pub.data.doi && publicationsCache[pub.data.doi]) {
+        const cacheEntry = publicationsCache[pub.data.doi];
+        
+        // Use cache data for missing fields
+        if (!enhancedData.title && cacheEntry.title) enhancedData.title = cacheEntry.title;
+        
+        // Parse authors from cache if needed
+        if (!enhancedData.authors && cacheEntry.authors) {
+          enhancedData.authors = cacheEntry.authors.split(', ');
+        }
+        
+        // Use venue and date from cache if needed
+        if (!enhancedData.venue && cacheEntry.venue) enhancedData.venue = cacheEntry.venue;
+        if (!enhancedData.publicationDate && cacheEntry.pubDate) enhancedData.publicationDate = cacheEntry.pubDate;
+      }
+      
+      // Return a new publication object with enhanced data
+      return {
+        ...pub,
+        data: enhancedData
+      };
+    });
+    
+    // Sort publications by date (most recent first)
+    publications.sort((a, b) => {
+      // Use publication date if available, fallback to when it was added to the database
+      const dateA = a.data.publicationDate || a.data.date || new Date();
+      const dateB = b.data.publicationDate || b.data.date || new Date();
+      return new Date(dateB).getTime() - new Date(dateA).getTime();
+    });
   }
 } catch (error) {
   console.error("Error fetching publications:", error);
@@ -83,6 +133,31 @@ function formatDate(date) {
     year: 'numeric', 
     month: 'long'
   }).format(parsedDate);
+}
+
+// Format publication date with more readable output
+function formatPublicationDate(date) {
+  if (!date) return "";
+  
+  const parsedDate = date instanceof Date ? date : new Date(date);
+  if (isNaN(parsedDate.getTime())) return "";
+  
+  return new Intl.DateTimeFormat('en-US', { 
+    year: 'numeric', 
+    month: 'long',
+    day: 'numeric'
+  }).format(parsedDate);
+}
+
+// Format author names for display
+function formatAuthors(authors) {
+  if (!authors || !Array.isArray(authors) || authors.length === 0) return "";
+  
+  if (authors.length === 1) return authors[0];
+  if (authors.length === 2) return `${authors[0]} and ${authors[1]}`;
+  
+  // For more than 2 authors, format as "First Author et al."
+  return `${authors[0]} et al.`;
 }
 
 // Helper to check if a value is valid and non-empty
@@ -171,9 +246,71 @@ const layoutProps = {
               {publications.map(pub => (
                 <li class="publication-item">
                   <h3>{pub.data.title}</h3>
-                  {pub.data.doi && (
-                    <p class="publication-doi">DOI: <a href={`https://doi.org/${pub.data.doi}`} target="_blank" rel="noopener noreferrer">{pub.data.doi}</a></p>
+                  
+                  {/* Show authors when available */}
+                  {pub.data.authors && pub.data.authors.length > 0 && (
+                    <p class="publication-authors">
+                      {pub.data.authors.join(', ')}
+                    </p>
                   )}
+                  
+                  {/* Display venue and year if available */}
+                  {(pub.data.venue || pub.data.publicationDate) && (
+                    <p class="publication-venue">
+                      {pub.data.venue && <span class="venue-name">{pub.data.venue}</span>}
+                      {pub.data.venue && pub.data.publicationDate && <span>, </span>}
+                      {pub.data.publicationDate && (
+                        <span class="venue-date">
+                          {formatPublicationDate(pub.data.publicationDate)}
+                        </span>
+                      )}
+                    </p>
+                  )}
+                  
+                  {/* Publication actions/links */}
+                  <div class="publication-links">
+                    {/* Link to DOI */}
+                    {pub.data.doi && (
+                      <a href={`https://doi.org/${pub.data.doi}`} 
+                         class="pub-link doi-link" 
+                         target="_blank" 
+                         rel="noopener noreferrer">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                          <polyline points="15 3 21 3 21 9"></polyline>
+                          <line x1="10" y1="14" x2="21" y2="3"></line>
+                        </svg>
+                        DOI
+                      </a>
+                    )}
+                    
+                    {/* Link to PDF if available */}
+                    {pub.data.pdf && (
+                      <a href={pub.data.pdf} 
+                         class="pub-link pdf-link" 
+                         target="_blank" 
+                         rel="noopener noreferrer">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                          <polyline points="14 2 14 8 20 8"></polyline>
+                          <line x1="16" y1="13" x2="8" y2="13"></line>
+                          <line x1="16" y1="17" x2="8" y2="17"></line>
+                          <polyline points="10 9 9 9 8 9"></polyline>
+                        </svg>
+                        PDF
+                      </a>
+                    )}
+                    
+                    {/* Link to publication details page */}
+                    <a href={`/publications/${pub.slug}/`} 
+                       class="pub-link details-link">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                      </svg>
+                      Details
+                    </a>
+                  </div>
                 </li>
               ))}
             </ul>
@@ -259,6 +396,78 @@ const layoutProps = {
   
   <Footer />
 </Layout>
+
+<style>
+  /* Additional styles for the enhanced publication display */
+  .publication-authors {
+    font-size: 0.95rem;
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+    font-style: italic;
+    color: var(--color-text-muted, rgba(var(--color-text-base), 0.75));
+  }
+  
+  .publication-venue {
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+    color: var(--color-text-muted, rgba(var(--color-text-base), 0.75));
+  }
+  
+  .venue-name {
+    font-weight: 500;
+  }
+  
+  .publication-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 1rem;
+  }
+  
+  .pub-link {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.35rem 0.75rem;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: background-color 0.2s ease;
+  }
+  
+  .pub-link svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .doi-link {
+    background-color: rgba(var(--color-accent), 0.1);
+    color: rgb(var(--color-accent));
+  }
+  
+  .doi-link:hover {
+    background-color: rgba(var(--color-accent), 0.2);
+  }
+  
+  .pdf-link {
+    background-color: rgba(220, 38, 38, 0.1);
+    color: rgb(220, 38, 38);
+  }
+  
+  .pdf-link:hover {
+    background-color: rgba(220, 38, 38, 0.2);
+  }
+  
+  .details-link {
+    background-color: rgba(var(--color-card-muted), 0.5);
+    color: var(--color-text-base, rgba(var(--color-text-base), 0.8));
+  }
+  
+  .details-link:hover {
+    background-color: rgba(var(--color-card-muted), 0.8);
+  }
+</style>
 
 <script is:inline>
   /** Create a progress indicator at the top */

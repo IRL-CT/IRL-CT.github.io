@@ -105,214 +105,204 @@ const activeSocials = Object.entries(socialLinks || {})
 
 <Layout {...layoutProps}>
   <Header activeNav="team" />
-
-  <div class="mx-auto flex w-full max-w-3xl justify-start px-2">
-    <button
-      class="focus-outline mb-2 mt-8 flex hover:opacity-75"
-      onclick="(() => (history.length === 1) ? window.location = '/team' : history.back())()"
-    >
-      <svg xmlns="http://www.w3.org/2000/svg"
-        ><path
-          d="M13.293 6.293 7.586 12l5.707 5.707 1.414-1.414L10.414 12l4.293-4.293z"
-        ></path>
-      </svg><span>Go back</span>
-    </button>
-  </div>
   
-  <main id="main-content">
-    <div class="team-member-header">
-      <div class="member-avatar-container">
-        {isValid(avatar) ? (
-          <img 
-            src={avatar.src} 
-            alt={`Photo of ${name}`}
-            class="member-avatar"
-            transition:name={`avatar-${slugifyStr(member.slug)}`}
-          />
-        ) : (
-          <div class="member-avatar-placeholder">
-            {name ? name.charAt(0) : "?"}
-          </div>
-        )}
-      </div>
-      
-      <div class="member-header-content">
-        <h1 transition:name={slugifyStr(name)} class="member-name">
-          {name}
-        </h1>
-        
-        <p class="member-role">{role}</p>
-        
-        {isValid(department) && (
-          <p class="member-department">{department}</p>
-        )}
-        
-        <p class="member-duration">
-          {active ? "Member since " : "Former member, "}
-          {isValid(joinDate) ? formatDate(joinDate) : "unknown date"}
-          {isValid(endDate) && !active ? ` until ${formatDate(endDate)}` : ""}
-        </p>
-        
-        <div class="member-contact-links">
-          {isValid(email) && (
-            <a href={`mailto:${email}`} class="contact-link email-link">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
-                <polyline points="22,6 12,13 2,6"></polyline>
-              </svg>
-              <span>{email}</span>
-            </a>
-          )}
-          
-          {isValid(website) && (
-            <a href={website} target="_blank" rel="noopener noreferrer" class="contact-link website-link">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="10"></circle>
-                <line x1="2" y1="12" x2="22" y2="12"></line>
-                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
-              </svg>
-              <span>Website</span>
-            </a>
-          )}
-        </div>
-        
-        {activeSocials.length > 0 && (
-          <div class="social-links">
-            {activeSocials.map(social => (
-              <a href={social.url} target="_blank" rel="noopener noreferrer" class="social-link" title={social.platform}>
-                <Fragment set:html={social.icon} />
-              </a>
-            ))}
-          </div>
-        )}
-      </div>
-    </div>
-
-    <div class="member-content">
-      <div class="member-main">
-        <section class="member-bio">
-          <h2>About</h2>
-          {isValid(bio) ? (
-            <div class="bio-content">
-              {bio}
-            </div>
-          ) : (
-            <div class="data-missing">No biographical information available.</div>
-          )}
-        </section>
-        
-        {isValid(research_interests) && (
-          <section class="research-interests">
-            <h2>Research Interests</h2>
-            <ul class="interest-list">
-              {research_interests.map(interest => (
-                <li class="interest-item">{interest}</li>
-              ))}
-            </ul>
-          </section>
-        )}
-        
-        {isValid(memberProjects) && memberProjects.length > 0 && (
-          <section class="member-projects">
-            <h2>Projects</h2>
-            <div class="projects-grid">
-              {memberProjects.map(project => (
-                <a href={`/projects/${project.data.id}/`} class="project-card">
-                  {project.data.image && (
-                    <div class="project-image">
-                      <img src={project.data.image.src} alt={project.data.title} />
-                    </div>
-                  )}
-                  <div class="project-content">
-                    <div class="project-status-badge" data-status={project.data.status}>
-                      {project.data.status}
-                    </div>
-                    <h3 class="project-title">{project.data.title}</h3>
-                    <p class="project-summary">{project.data.summary}</p>
-                  </div>
-                </a>
-              ))}
-            </div>
-          </section>
-        )}
-      </div>
-      
-      <aside class="member-sidebar">
-        {isValid(education) && (
-          <div class="education-section">
-            <h3>Education</h3>
-            <ul class="education-list">
-              {education.map(edu => (
-                <li class="education-item">
-                  <span class="degree">{edu.degree}</span>
-                  <span class="institution">{edu.institution}</span>
-                  <span class="year">{edu.year}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-        
-        {/* If we had connected publications */}
-        {isValid(memberPublications) && memberPublications.length > 0 && (
-          <div class="publications-section">
-            <h3>Publications</h3>
-            <ul class="publication-list">
-              {memberPublications.map(pub => (
-                <li class="publication-item">
-                  <a href={`/publications/${pub.slug}/`}>{pub.data.title}</a>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-        
-        {/* Related team members - could show others with same role */}
-        <div class="related-members">
-          <h3>Team Members</h3>
-          <div class="related-members-grid">
-            {teamMembers
-              .filter(m => m.data.id !== member.slug && m.data.role === role)
-              .slice(0, 3)
-              .map(m => (
-                <a href={`/team/${m.data.id}/`} class="related-member">
-                  <div class="related-member-avatar">
-                    {m.data.avatar ? (
-                      <img src={m.data.avatar.src} alt={m.data.name} />
-                    ) : (
-                      <div class="avatar-placeholder">{m.data.name.charAt(0)}</div>
-                    )}
-                  </div>
-                  <span class="related-member-name">{m.data.name}</span>
-                </a>
-              ))
-            }
-          </div>
-          <div class="view-all-link">
-            <a href="/team/">View All Team Members</a>
-          </div>
-        </div>
-      </aside>
-    </div>
-    
-    <div class="flex flex-col-reverse items-center justify-between gap-6 sm:flex-row-reverse sm:items-end sm:gap-4">
+  <div class="max-w-6xl mx-auto px-4">  <!-- Added main wrapper div for consistent centering -->
+    <div class="mx-auto flex w-full max-w-5xl justify-start">
       <button
-        id="back-to-top"
-        class="focus-outline whitespace-nowrap py-1 hover:opacity-75"
+        class="focus-outline mb-2 mt-8 flex hover:opacity-75"
+        onclick="(() => (history.length === 1) ? window.location = '/team' : history.back())()"
       >
-        <svg xmlns="http://www.w3.org/2000/svg" class="rotate-90">
-          <path
+        <svg xmlns="http://www.w3.org/2000/svg"
+          ><path
             d="M13.293 6.293 7.586 12l5.707 5.707 1.414-1.414L10.414 12l4.293-4.293z"
           ></path>
-        </svg>
-        <span>Back to Top</span>
+        </svg><span>Go back</span>
       </button>
-
-      <ShareLinks />
     </div>
-  </main>
-  
-  <Footer />
+    
+    <main id="main-content" class="mx-auto w-full max-w-5xl pb-12">
+      <div class="team-member-header">
+        <div class="member-avatar-container">
+          {isValid(avatar) ? (
+            <img 
+              src={avatar.src} 
+              alt={`Photo of ${name}`}
+              class="member-avatar"
+              transition:name={`avatar-${slugifyStr(member.slug)}`}
+            />
+          ) : (
+            <div class="member-avatar-placeholder">
+              {name ? name.charAt(0) : "?"}
+            </div>
+          )}
+        </div>
+        
+        <div class="member-header-content">
+          <h1 transition:name={slugifyStr(name)} class="member-name">
+            {name}
+          </h1>
+          
+          <p class="member-role">{role}</p>
+          
+          {isValid(department) && (
+            <p class="member-department">{department}</p>
+          )}
+          
+          <p class="member-duration">
+            {active ? "Member since " : "Former member, "}
+            {isValid(joinDate) ? formatDate(joinDate) : "unknown date"}
+            {isValid(endDate) && !active ? ` until ${formatDate(endDate)}` : ""}
+          </p>
+          
+          <div class="member-contact-links">
+            {isValid(email) && (
+              <a href={`mailto:${email}`} class="contact-link email-link">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                  <polyline points="22,6 12,13 2,6"></polyline>
+                </svg>
+                <span>{email}</span>
+              </a>
+            )}
+            
+            {isValid(website) && (
+              <a href={website} target="_blank" rel="noopener noreferrer" class="contact-link website-link">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="2" y1="12" x2="22" y2="12"></line>
+                  <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                </svg>
+                <span>Website</span>
+              </a>
+            )}
+          </div>
+          
+          {activeSocials.length > 0 && (
+            <div class="social-links">
+              {activeSocials.map(social => (
+                <a href={social.url} target="_blank" rel="noopener noreferrer" class="social-link" title={social.platform}>
+                  <Fragment set:html={social.icon} />
+                </a>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div class="member-content">
+        <div class="member-main">
+          <section class="member-bio">
+            <h2>About</h2>
+            {isValid(bio) ? (
+              <div class="bio-content">
+                {bio}
+              </div>
+            ) : (
+              <div class="data-missing">No biographical information available.</div>
+            )}
+          </section>
+          
+          {isValid(research_interests) && (
+            <section class="research-interests">
+              <h2>Research Interests</h2>
+              <ul class="interest-list">
+                {research_interests.map(interest => (
+                  <li class="interest-item">{interest}</li>
+                ))}
+              </ul>
+            </section>
+          )}
+          
+          {isValid(memberProjects) && memberProjects.length > 0 && (
+            <section class="member-projects">
+              <h2>Projects</h2>
+              <div class="projects-grid grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {memberProjects.map(project => (
+                  <a href={`/projects/${project.data.id}/`} class="project-card flex flex-col overflow-hidden rounded-lg border border-skin-line bg-skin-card shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-lg">
+                    {project.data.image && (
+                      <div class="project-image h-48 overflow-hidden">
+                        <img src={project.data.image.src} alt={project.data.title} class="h-full w-full object-cover" />
+                      </div>
+                    )}
+                    <div class="project-content flex flex-1 flex-col p-4">
+                      <div class="project-status-badge mb-2 inline-block rounded-full px-2 py-1 text-xs font-medium" data-status={project.data.status}>
+                        {project.data.status}
+                      </div>
+                      <h3 class="project-title mb-2 text-lg font-semibold">{project.data.title}</h3>
+                      <p class="project-summary line-clamp-2 mb-2 text-sm flex-grow">
+                        {project.data.summary}
+                      </p>
+                      {project.data.tags && project.data.tags.length > 0 && (
+                        <div class="project-tags mt-auto flex flex-wrap gap-2">
+                          {project.data.tags.slice(0, 3).map((tag) => (
+                            <span class="project-tag rounded-full bg-skin-card-muted px-2 py-1 text-xs">{tag}</span>
+                          ))}
+                          {project.data.tags.length > 3 && 
+                            <span class="project-tag-more rounded-full bg-skin-accent px-2 py-1 text-xs text-skin-inverted">+{String(project.data.tags.length - 3)}</span>
+                          }
+                        </div>
+                      )}
+                    </div>
+                  </a>
+                ))}
+              </div>
+            </section>
+          )}
+        </div>
+        
+        <aside class="member-sidebar">
+          {isValid(education) && (
+            <div class="education-section">
+              <h3>Education</h3>
+              <ul class="education-list">
+                {education.map(edu => (
+                  <li class="education-item">
+                    <span class="degree">{edu.degree}</span>
+                    <span class="institution">{edu.institution}</span>
+                    <span class="year">{edu.year}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+          
+          {/* If we had connected publications */}
+          {isValid(memberPublications) && memberPublications.length > 0 && (
+            <div class="publications-section">
+              <h3>Publications</h3>
+              <ul class="publication-list">
+                {memberPublications.map(pub => (
+                  <li class="publication-item">
+                    <a href={`/publications/${pub.slug}/`}>{pub.data.title}</a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+          
+          {/* Removed "Team Members" section as requested */}
+        </aside>
+      </div>
+      
+      <div class="flex flex-col-reverse items-center justify-between gap-6 sm:flex-row-reverse sm:items-end sm:gap-4">
+        <button
+          id="back-to-top"
+          class="focus-outline whitespace-nowrap py-1 hover:opacity-75"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="rotate-90">
+            <path
+              d="M13.293 6.293 7.586 12l5.707 5.707 1.414-1.414L10.414 12l4.293-4.293z"
+            ></path>
+          </svg>
+          <span>Back to Top</span>
+        </button>
+
+        <ShareLinks />
+      </div>
+    </main>
+    
+    <Footer />
+  </div>
 </Layout>
 
 <script is:inline>
