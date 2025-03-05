@@ -1,8 +1,8 @@
-# Cornell Interaction Design Research Lab Website
+# IRL: Interaction Research Lab Website
 
 ## Content Management Guide
 
-This guide will help you add and update content on the Cornell Interaction Design Research Lab website.
+This guide will help you add and update content on the IRL: Interaction Research Lab website.
 
 ### Table of Contents
 

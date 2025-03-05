@@ -3,8 +3,8 @@ import type { Site, SocialObjects } from "./types";
 export const SITE: Site = {
   website: "https://astro-paper.pages.dev/", // replace this with your deployed domain
   author: "CIDRL",
-  profile: "Cornell Interaction Design Research Lab",
-  desc: "Cornell Interaction Design Research Lab",
+  profile: "IRL: Interaction Research Lab",
+  desc: "IRL: Interaction Research Lab",
   title: "CIDRL",
   ogImage: "astropaper-og.jpg",
   lightAndDarkMode: true,
