@@ -57,7 +57,7 @@ async function fetchPublicationMetadata(doi) {
     
     const response = await fetch(`https://api.crossref.org/works/${doi}`, {
       headers: {
-        'User-Agent': 'CIDRL Publication Cache/1.0 (https://cidrl.cornell.edu; mailto:contact@cidrl.cornell.edu)'
+        'User-Agent': 'IRL: Interaction Research Lab Publication Cache/1.0 (https://cidrl.cornell.edu; mailto:contact@cidrl.cornell.edu)'
       }
     });
     
