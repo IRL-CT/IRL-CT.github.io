@@ -100,7 +100,7 @@ function formatDate(date) {
       <ul class="publication-list-home">
         {papers.map(paper => (
           <li class="publication-item-home" data-year={paper.pubYear}>
-            <h3>{paper.title}</h3>
+            <h3 class="publication-title">{paper.title}</h3>
             <p class="publication-authors">{paper.authors}</p>
             {paper.venue && <p class="publication-venue">{paper.venue}</p>}
             <p class="publication-date">
@@ -123,6 +123,11 @@ function formatDate(date) {
           </li>
         ))}
       </ul>
+      
+      <!-- Add results counter -->
+      <div class="publication-results-counter">
+        <p id="results-counter">Showing {papers.length} publications</p>
+      </div>
     </div>
   )}
   
@@ -158,21 +163,21 @@ function formatDate(date) {
         }
       }
     });
-    
+
     // Calculate ideal min height for container
     const feedContainer = document.querySelector('.publications-complete-feed');
     if (feedContainer) {
       const minHeight = Math.max(500, feedContainer.offsetHeight);
       feedContainer.style.minHeight = `${minHeight}px`;
     }
-    
+
     // Signal that publications are ready for filtering
     document.dispatchEvent(new CustomEvent('publications-loaded'));
   }
-  
+
   // Run enhancement when DOM is loaded
   document.addEventListener('DOMContentLoaded', enhancePublications);
-  
+
   // Also try running it now in case DOM is already ready
   if (document.readyState === 'interactive' || document.readyState === 'complete') {
     enhancePublications();
@@ -185,14 +190,14 @@ function formatDate(date) {
     display: flex;
     flex-direction: column;
   }
-  
+
   .doi-paper-feed h2 {
     font-size: 1.8rem;
     font-weight: 600;
     margin-bottom: 1.5rem;
     color: rgb(var(--color-accent));
   }
-  
+
   .publication-list-home {
     list-style: none;
     padding: 0;
@@ -203,7 +208,7 @@ function formatDate(date) {
     flex: 1;
     min-height: 300px; /* Ensures minimum height even when empty */
   }
-  
+
   .publication-item-home {
     padding-bottom: 1rem;
     border-bottom: 1px solid rgba(var(--color-border), 0.8);
@@ -221,7 +226,7 @@ function formatDate(date) {
     line-height: 1.4;
     color: rgb(var(--color-text-base));
   }
-  
+
   .publication-authors,
   .publication-venue,
   .publication-date {
@@ -229,11 +234,11 @@ function formatDate(date) {
     margin: 0.25rem 0;
     color: rgba(var(--color-text-base), 0.7);
   }
-  
+
   .publication-authors {
     font-style: italic;
   }
-  
+
   .publication-link {
     font-size: 0.85rem;
     color: rgb(var(--color-accent));
@@ -244,11 +249,19 @@ function formatDate(date) {
     margin-top: 0.5rem;
     font-weight: 500;
   }
-  
+
   .publication-link:hover {
     text-decoration: underline;
   }
-  
+
+  .publication-results-counter {
+    margin-top: 1.5rem;
+    text-align: center;
+    color: rgba(var(--color-text-base), 0.7);
+    font-size: 0.9rem;
+    font-style: italic;
+  }
+
   .section-link {
     text-align: center;
     margin-top: 2rem;
@@ -259,17 +272,16 @@ function formatDate(date) {
   .info-message {
     text-align: center;
     padding: 1rem 0;
+    font-size: 0.9rem;
     color: rgba(var(--color-text-base), 0.8);
     font-style: italic;
-    font-size: 0.9rem;
   }
   
   .error-message {
     color: #e53e3e;
   }
-  
+
   .info-message {
-    color: rgba(var(--color-text-base), 0.7);
     background-color: rgba(var(--color-card-muted), 0.3);
     padding: 0.75rem;
     border-radius: 0.25rem;

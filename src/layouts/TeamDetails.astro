@@ -12,9 +12,10 @@ import type { CollectionEntry } from "astro:content";
 export interface Props {
   member: CollectionEntry<"team">;
   teamMembers: CollectionEntry<"team">[];
+  projects: CollectionEntry<"projects">[];
 }
 
-const { member, teamMembers } = Astro.props;
+const { member, teamMembers, projects } = Astro.props;
 
 // Use member.slug instead of the custom id field
 const {
@@ -37,12 +38,15 @@ const {
 // Get projects associated with this team member
 let memberProjects = [];
 try {
-  const projects = await getCollection("projects");
   memberProjects = projects.filter(project => 
     project.data.teamMemberIds && project.data.teamMemberIds.includes(member.slug)
   );
+  console.log(`Loaded ${memberProjects.length} projects for team member ${member.slug}`);
+  memberProjects.forEach(project => {
+    console.log(`- Project: ${project.slug}`);
+  });
 } catch (error) {
-  console.error("Error fetching projects:", error);
+  console.error("Error filtering projects:", error);
 }
 
 // Get publications associated with this team member
@@ -218,7 +222,7 @@ const activeSocials = Object.entries(socialLinks || {})
               <h2>Projects</h2>
               <div class="projects-grid grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {memberProjects.map(project => (
-                  <a href={`/projects/${project.data.id}/`} class="project-card flex flex-col overflow-hidden rounded-lg border border-skin-line bg-skin-card shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-lg">
+                  <a href={`/projects/${project.slug}/`} class="project-card flex flex-col overflow-hidden rounded-lg border border-skin-line bg-skin-card shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-lg">
                     {project.data.image && (
                       <div class="project-image h-48 overflow-hidden">
                         <img src={project.data.image.src} alt={project.data.title} class="h-full w-full object-cover" />

@@ -13,6 +13,11 @@ export async function getStaticPaths() {
 
 const { member } = Astro.props;
 const teamMembers = await getCollection("team");
+const projects = await getCollection("projects");
 ---
 
-<TeamDetails member={member} teamMembers={teamMembers} />
+<TeamDetails 
+  member={member} 
+  teamMembers={teamMembers} 
+  projects={projects} 
+/>
