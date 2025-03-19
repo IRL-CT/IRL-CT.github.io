@@ -2,10 +2,10 @@ import type { Site, SocialObjects } from "./types";
 
 export const SITE: Site = {
   website: "https://irl.tech.cornell.edu", // replace this with your deployed domain
-  author: "IRL: Interaction Research Lab",
-  profile: "IRL: Interaction Research Lab",
-  desc: "IRL: Interaction Research Lab",
-  title: "IRL: Interaction Research Lab",
+  author: "Interaction Research Lab",
+  profile: "Interaction Research Lab",
+  desc: "The digital home of the Interaction Research Lab at Cornell Tech.",
+  title: "Interaction Research Lab",
   ogImage: "astropaper-og.jpg",
   lightAndDarkMode: true,
   postPerIndex: 4,
@@ -26,16 +26,16 @@ export const LOCALE = {
 } as const;
 
 export const LOGO_IMAGE = {
-  enable: false,
+  enable: true,
   svg: false,
-  width: 250,
-  height: 150,
+  width: "50rem",
+  height: "50rem",
 };
 
 export const SOCIALS: SocialObjects = [
   {
     name: "Github",
-    href: "https://github.com/cidrl",
+    href: "https://github.com/irl-ct",
     linkTitle: ` ${SITE.title} on Github`,
     active: false,
   },
