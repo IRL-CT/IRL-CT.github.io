@@ -8,7 +8,7 @@
     /* Cornell Light Theme */
     --color-fill: 250, 250, 249;           /* Off-white background */
     --color-text-base: 51, 51, 51;         /* Dark gray text */
-    --color-accent: 37, 128, 174;           /* Cornell Red */
+    --color-accent: 37, 128, 174;           /* Blue color of desks in lab */
     --color-accent-dark: 150, 22, 22;      /* Darker Cornell Red */
     --color-card: 242, 242, 242;           /* Light gray card background */
     --color-card-muted: 224, 224, 224;     /* Muted gray for card accents */
@@ -27,9 +27,9 @@
   
   html[data-theme="dark"] {
     /* Cornell Dark Theme */
-    --color-fill: 35, 35, 40;              /* Dark background */
+    --color-fill: 25, 35, 40;              /* Dark background */
     --color-text-base: 235, 235, 235;      /* Light text for readability */
-    --color-accent: 230, 75, 75;           /* Lighter Cornell Red for dark mode */
+    --color-accent: 102, 166, 198;           /* Lighter version of blue desk color */
     --color-accent-dark: 200, 50, 50;      /* Slightly darker accent for hover states */
     --color-card: 50, 50, 55;              /* Dark card background */
     --color-card-muted: 70, 70, 75;        /* Slightly lighter card accents */
