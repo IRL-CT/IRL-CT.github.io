@@ -14,11 +14,6 @@ export async function getStaticPaths() {
   
   // Sort projects - first by status priority, then by date
   const sortedProjects = filteredProjects.sort((a, b) => {
-    // Sort by status priority (ongoing first, then planned, then completed)
-    const statusOrder = { ongoing: 0, planned: 1, completed: 2 };
-    const statusDiff = statusOrder[a.data.status] - statusOrder[b.data.status];
-    
-    if (statusDiff !== 0) return statusDiff;
     
     // If same status, sort by startDate (most recent first)
     return new Date(b.data.startDate).getTime() - new Date(a.data.startDate).getTime();

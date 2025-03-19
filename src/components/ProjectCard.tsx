@@ -9,7 +9,7 @@ export interface Props {
 }
 
 export default function ProjectCard({ href, project, secHeading = true }: Props) {
-  const { id, title, summary, status, startDate, tags, image } = project;
+  const {title, summary, startDate, tags, image } = project;
 
   const headerProps = {
     style: { viewTransitionName: slugifyStr(title) },
@@ -30,14 +30,6 @@ export default function ProjectCard({ href, project, secHeading = true }: Props)
       </a>
       
       <div className="flex items-center gap-2 mt-1">
-        <span 
-          className={`inline-block px-2 py-0.5 text-xs font-medium uppercase rounded-full 
-            ${status === "ongoing" ? "bg-green-100 text-green-800" : 
-              status === "completed" ? "bg-blue-100 text-blue-800" : 
-              "bg-amber-100 text-amber-800"}`}
-        >
-          {status}
-        </span>
         
         {startDate && 
           <span className="text-sm text-gray-600">

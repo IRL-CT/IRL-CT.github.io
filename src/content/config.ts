@@ -43,7 +43,6 @@ const projects = defineCollection({
       title: z.string(),
       summary: z.string(),
       featured: z.boolean().optional(),
-      status: z.enum(["ongoing", "completed", "planned"]),
       startDate: z.string(),
       endDate: z.string().optional(),
       tags: z.array(z.string()).default([]),

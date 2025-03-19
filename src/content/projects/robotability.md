@@ -5,7 +5,6 @@ summary: "The Robotability Score (R) is a novel metric that quantifies how suita
 startDate: "2024"
 teamMemberIds: ["matt", "teresa", "frank", "wendy"]
 publicationIds: ["robotability"]
-status: "ongoing"
 image: "assets/projects/robotability.png"
 externalLink: "https://robotability.cornell.edu"
 ---

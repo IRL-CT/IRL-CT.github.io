@@ -1,6 +1,5 @@
 ---
 title: "Privacy of Groups in Dense Street Imagery"
-status: "ongoing"
 featured: true
 startDate: "2024"
 teamMemberIds: ["matt", "hauke", "wendy"]

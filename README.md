@@ -88,7 +88,6 @@ Projects are stored as markdown files in the `src/content/projects` directory.
    title: "AI Ethics Toolkit for Designers"
    summary: "A toolkit to help designers evaluate ethical implications of AI interfaces"
    featured: true
-   status: "ongoing"
    startDate: "2023-01"
    endDate: "2024-12"
    tags: 
@@ -128,7 +127,6 @@ Projects are stored as markdown files in the `src/content/projects` directory.
 3. **Required Fields Explanation:**
    - `title`: Project name
    - `summary`: Brief 1-2 sentence description
-   - `status`: Choose from "ongoing", "completed", or "planned"
    - `startDate`: When the project began (YYYY-MM format)
    - `teamMemberIds`: List of team member file names (without .md extension)
    - `tags`: Keywords that describe the project (for filtering and search)

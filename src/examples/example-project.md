@@ -2,7 +2,6 @@
 title: "Collaborative Scientific Visualization Tools"
 summary: "Building interactive visualization tools for scientific teams to explore and analyze complex datasets together"
 featured: false
-status: "ongoing"
 startDate: "2023-09"
 endDate: "2025-05"
 tags: 

@@ -23,7 +23,6 @@ const { project, projects } = Astro.props;
 const {
   title,
   summary,
-  status,
   startDate,
   endDate,
   tags,
@@ -197,13 +196,6 @@ const layoutProps = {
     
     <div class="project-header">
       <div class="project-header-content">
-        {isValid(status) ? (
-          <div class="project-status-badge" data-status={status}>
-            {status}
-          </div>
-        ) : (
-          <div class="data-missing">Status not specified</div>
-        )}
         
         <h1 transition:name={slugifyStr(title)} class="project-title">
           {title}
