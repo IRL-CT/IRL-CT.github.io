@@ -541,6 +541,16 @@
   .social-links {
     font-weight: 500;
   }
+
+  /* Add this new style for main section spacing */
+  main {
+    @apply pt-4; /* Base padding for all main elements */
+  }
+  
+  /* Specific style for search page */
+  .search-heading {
+    @apply mt-8 mb-6; /* Add more top margin for search page heading */
+  }
 }
 
 @layer components {

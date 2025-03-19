@@ -18,7 +18,8 @@ export type Props = StringTitleProp | ArrayTitleProp;
 
 const { props } = Astro;
 // Default showBreadcrumbs to true if not explicitly set to false
-const showBreadcrumbs = props.showBreadcrumbs !== false;
+//const showBreadcrumbs = props.showBreadcrumbs !== false;
+const showBreadcrumbs = false;
 ---
 
 {showBreadcrumbs && <Breadcrumbs />}

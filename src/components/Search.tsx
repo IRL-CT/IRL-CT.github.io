@@ -1,13 +1,17 @@
 import Fuse from "fuse.js";
 import { useEffect, useRef, useState, useMemo, type FormEvent } from "react";
-import Card from "@components/Card";
 import type { CollectionEntry } from "astro:content";
 
 export type SearchItem = {
   title: string;
   description: string;
-  data: CollectionEntry<"blog">["data"];
+  authors?: string;
+  venue?: string;
+  data: CollectionEntry<"publications" | "projects" | "team">["data"];
   slug: string;
+  collection: "publications" | "projects" | "team";
+  displayDate?: string;
+  searchContent?: string;
 };
 
 interface Props {
@@ -33,10 +37,18 @@ export default function SearchBar({ searchList }: Props) {
   const fuse = useMemo(
     () =>
       new Fuse(searchList, {
-        keys: ["title", "description"],
+        keys: [
+          { name: 'title', weight: 2 },
+          { name: 'authors', weight: 2.5 }, // Increased weight for author matches
+          { name: 'searchContent', weight: 1 }
+        ],
         includeMatches: true,
         minMatchCharLength: 2,
-        threshold: 0.5,
+        threshold: 0.4, // More permissive threshold for author name matching
+        ignoreLocation: true, // Ignore where in the string the match occurs
+        location: 0,
+        distance: 1000, // Increased for longer texts
+        useExtendedSearch: true, // Enable extended search capabilities
       }),
     [searchList]
   );
@@ -80,6 +92,54 @@ export default function SearchBar({ searchList }: Props) {
     }
   }, [inputVal]);
 
+  // Function to get the correct URL based on collection type
+  const getItemUrl = (item: SearchItem): string => {
+    switch (item.collection) {
+      case "publications":
+        return `/publications/${item.slug}/`;
+      case "projects":
+        return `/projects/${item.slug}/`;
+      case "team":
+        return `/team/${item.slug}/`;
+      default:
+        return `/${item.slug}/`;
+    }
+  };
+
+  // Function to render custom search result item
+  const renderSearchResult = (item: SearchItem) => {
+    return (
+      <div className="search-result-item my-6 border border-skin-line rounded-lg p-4 hover:bg-skin-card-muted">
+        <a href={getItemUrl(item)} className="block">
+          <h3 className="text-lg font-semibold">{item.title}</h3>
+          
+          {item.collection === "publications" && item.authors && (
+            <p className="text-sm text-skin-base mt-1">{item.authors}</p>
+          )}
+          
+          {item.displayDate && (
+            <p className="text-sm text-skin-base opacity-75 mt-1">
+              {item.collection === "publications" && item.venue ? `${item.venue}, ${item.displayDate}` : item.displayDate}
+            </p>
+          )}
+          
+          {item.description && (
+            <p className="text-skin-base mt-2">
+              {item.description.length > 200 
+                ? `${item.description.substring(0, 200)}...` 
+                : item.description}
+            </p>
+          )}
+          
+          <span className="inline-block mt-2 text-sm bg-skin-accent text-skin-inverted px-2 py-1 rounded">
+            {item.collection === "publications" ? "Publication" : 
+             item.collection === "projects" ? "Project" : "Team Member"}
+          </span>
+        </a>
+      </div>
+    );
+  };
+
   return (
     <>
       <label className="relative block">
@@ -91,13 +151,12 @@ export default function SearchBar({ searchList }: Props) {
         </span>
         <input
           className="block w-full rounded border border-skin-fill/40 bg-skin-fill py-3 pl-10 pr-3 placeholder:italic focus:border-skin-accent focus:outline-none"
-          placeholder="Search for anything..."
+          placeholder="Search publications, projects, and team members..."
           type="text"
           name="search"
           value={inputVal}
           onChange={handleChange}
           autoComplete="off"
-          // autoFocus
           ref={inputRef}
         />
       </label>
@@ -112,16 +171,13 @@ export default function SearchBar({ searchList }: Props) {
         </div>
       )}
 
-      <ul>
-        {searchResults &&
-          searchResults.map(({ item, refIndex }) => (
-            <Card
-              href={`/posts/${item.slug}/`}
-              frontmatter={item.data}
-              key={`${refIndex}-${item.slug}`}
-            />
-          ))}
-      </ul>
+      <div className="mt-6">
+        {searchResults && searchResults.map(({ item, refIndex }) => (
+          <div key={`${refIndex}-${item.slug}`}>
+            {renderSearchResult(item)}
+          </div>
+        ))}
+      </div>
     </>
   );
 }

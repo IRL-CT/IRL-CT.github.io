@@ -6,24 +6,107 @@ import Main from "@layouts/Main.astro";
 import Header from "@components/Header.astro";
 import Footer from "@components/Footer.astro";
 import SearchBar from "@components/Search";
-import getSortedPosts from "@utils/getSortedPosts";
+import fs from 'fs';
+import path from 'path';
 
-// Retrieve all published articles
-const posts = await getCollection("blog", ({ data }) => !data.draft);
-const sortedPosts = getSortedPosts(posts);
+// Function to format dates for display
+function formatDate(dateStr) {
+  if (!dateStr) return "";
+  const date = new Date(dateStr);
+  if (isNaN(date.getTime())) return "";
+  return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long' });
+}
 
-// List of items to search in
-const searchList = sortedPosts.map(({ data, slug }) => ({
-  title: data.title,
-  description: data.description,
-  data,
-  slug,
-}));
+// Helper function to optimize author names for searching
+function prepareAuthorNames(authors) {
+  if (!authors) return "";
+  // Split by comma and strip extra spaces to make searching more reliable
+  return authors
+    .split(',')
+    .map(author => author.trim())
+    .join(' '); // Join with spaces for better partial matching
+}
+
+// Read the publications cache
+const publicationCachePath = path.join(process.cwd(), 'public/data/publications-cache.json');
+let publicationCache = { publications: {} };
+
+try {
+  if (fs.existsSync(publicationCachePath)) {
+    const cacheContent = fs.readFileSync(publicationCachePath, 'utf-8');
+    publicationCache = JSON.parse(cacheContent);
+  }
+} catch (error) {
+  console.error("Error reading publication cache:", error);
+}
+
+// Retrieve collections
+const publications = await getCollection("publications", ({ data }) => !data.draft);
+const projects = await getCollection("projects", ({ data }) => !data.draft);
+const teamMembers = await getCollection("team", ({ data }) => !data.draft);
+
+// For projects - sort by startDate
+projects.sort((a, b) => {
+  const dateA = new Date(a.data.startDate).valueOf();
+  const dateB = new Date(b.data.startDate).valueOf();
+  return dateB - dateA; // Sort newest first
+});
+
+// For team members - sort by name if no order field
+teamMembers.sort((a, b) => {
+  if (a.data.order !== undefined && b.data.order !== undefined) {
+    return a.data.order - b.data.order;
+  }
+  return a.data.name.localeCompare(b.data.name);
+});
+
+// Create search items from publications cache with improved author handling
+const publicationItems = publications.map(({ data, slug }) => {
+  const cachedData = publicationCache.publications[data.doi];
+  const authors = cachedData?.authors || "";
+  const preparedAuthors = prepareAuthorNames(authors);
+  
+  return {
+    title: cachedData?.title || data.manual_override?.citation || `Publication ${data.doi}`,
+    description: data.manual_override?.abstract || "",
+    authors: authors,
+    venue: cachedData?.venue || "",
+    data,
+    slug,
+    collection: "publications" as const,
+    displayDate: formatDate(cachedData?.pubDate) || data.manual_override?.publication_date,
+    // Enhanced searchContent with author names optimized for search
+    searchContent: `${cachedData?.title || ""} ${preparedAuthors} ${cachedData?.venue || ""} ${data.manual_override?.citation || ""} ${data.manual_override?.abstract || ""}`
+  };
+});
+
+// Create combined search list with collection type
+const searchList = [
+  ...publicationItems,
+  ...projects.map(({ data, slug }) => ({
+    title: data.title,
+    description: data.summary || data.description || "",
+    data,
+    slug,
+    collection: "projects" as const,
+    displayDate: formatDate(data.startDate),
+    searchContent: `${data.title} ${data.summary || ""} ${data.description || ""} ${data.tags.join(" ")}`
+  })),
+  ...teamMembers.map(({ data, slug }) => ({
+    title: data.name,
+    description: data.bio || "",
+    data,
+    slug,
+    collection: "team" as const,
+    displayDate: data.joinDate ? `Joined: ${formatDate(data.joinDate)}` : "",
+    searchContent: `${data.name} ${data.role} ${data.bio || ""} ${data.research_interests?.join(" ") || ""}`
+  }))
+];
 ---
 
 <Layout title={`Search | ${SITE.title}`}>
   <Header activeNav="search" />
-  <Main pageTitle="Search" pageDesc="Search any article ...">
+  <Main pageTitle="Search" pageDesc="Search publications, projects, and team members">
     <SearchBar client:load searchList={searchList} />
   </Main>
   <Footer />
