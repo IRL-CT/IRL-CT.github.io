@@ -58,16 +58,16 @@ const { activeNav } = Astro.props;
         <ul id="menu-items" class="display-none sm:flex">
           <li>
             <a href="/team" class={activeNav === "team" ? "active" : ""}>
-              Team
+              team
             </a>
           </li>
           <li>
             <a href="/projects" class={activeNav === "projects" ? "active" : ""}>
-              Projects
+              projects
             </a>
           <li>
             <a href="/publications/" class={activeNav === "publications" ? "active" : ""}>
-              Publications
+              publications
             </a>
           </li>
           {
@@ -181,7 +181,7 @@ const { activeNav } = Astro.props;
     @apply col-span-2 flex items-center justify-center;
   }
   nav ul li a {
-    @apply w-full px-4 py-3 text-center font-medium hover:text-skin-accent sm:my-0 sm:px-2 sm:py-1;
+    @apply w-full px-4 py-3 text-center font-semibold hover:text-skin-accent sm:my-0 sm:px-2 sm:py-1;
   }
   nav ul li:nth-last-child(2) a {
     @apply w-auto;

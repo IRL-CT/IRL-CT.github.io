@@ -71,12 +71,7 @@ Object.keys(groupedMembers).forEach(role => {
 <Layout title={title} description={description}>
   <Header activeNav="team" />
   
-  <main id="main-content" class="team-container">
-    <h1>Our Team</h1>
-    <p class="team-description">
-      The IRL: Interaction Research Lab team, directed by Associate Wendy Ju, consists of doctoral students, interns, and visting researchers. The IRL: Interaction Research Lab lab is based at Cornell Tech, in New York City.
-    </p>
-    
+  <main id="main-content" class="team-container mx-auto w-full max-w-5xl px-4 pb-12">
     <div class="filters">
       <h2>Filter by Role</h2>
       <div class="filter-buttons">
@@ -200,11 +195,6 @@ Object.keys(groupedMembers).forEach(role => {
 </script>
 
 <style>
-  .team-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 2rem 1.5rem;
-  }
   
   h1 {
     font-size: 2.5rem;

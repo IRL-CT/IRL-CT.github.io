@@ -1,114 +1,125 @@
 ---
 import LinkButton from "./LinkButton.astro";
-import { 
-  getAllCachedPublications,
-  getPublicationFromCache,
-  isPublicationCached
-} from "@utils/publicationCache.js";
+import type { CollectionEntry } from "astro:content";
 
 export interface Props {
-  dois: string[];
+  publications: CollectionEntry<"publications">[];
   title?: string;
   showViewAllLink?: boolean;
   viewAllUrl?: string;
   maxItems?: number;
   className?: string;
+  itemsPerPage?: number;
+  enablePagination?: boolean;
+  enableSearch?: boolean;
+  searchInputId?: string;
 }
 
 const { 
-  dois, 
+  publications, 
   title = "Recent Publications",
   showViewAllLink = true,
   viewAllUrl = "/publications/",
-  maxItems = 5,
-  className = ""
+  maxItems = 100,
+  className = "",
+  itemsPerPage = 20,
+  enablePagination = false,
+  enableSearch = false,
+  searchInputId = ""
 } = Astro.props;
 
-// Limit the number of DOIs to display
-const limitedDois = dois.slice(0, maxItems);
-
-// This function is only executed during build time!
-// It's safe to use here as it doesn't hit the API during user requests
-function getPublicationData(dois) {
-  const publications = [];
-  
-  for (const doi of dois) {
-    const cachedData = getPublicationFromCache(doi);
-    
-    if (cachedData) {
-      publications.push({
-        title: cachedData.title,
-        authors: cachedData.authors,
-        doi: cachedData.doi,
-        venue: cachedData.venue,
-        pubDate: cachedData.pubDate ? new Date(cachedData.pubDate) : null,
-        pubYear: cachedData.pubYear
-      });
-    } else {
-      // Fallback for publications not in cache
-      publications.push({
-        title: "Publication details loading...",
-        authors: "See DOI for details",
-        doi: doi,
-        venue: "",
-        pubDate: null,
-        pubYear: doi.match(/20\d\d/) ? doi.match(/20\d\d/)[0] : null
-      });
-      
-      // Log that this DOI is missing from cache during build
-      console.warn(`Publication cache miss for DOI: ${doi}`);
-    }
-  }
-  
-  // Sort publications by date (newest first)
-  return publications.sort((a, b) => {
-    // First by year
-    if (a.pubYear && b.pubYear && a.pubYear !== b.pubYear) {
-      return parseInt(b.pubYear) - parseInt(a.pubYear);
-    }
-    // Then by date if available
-    if (a.pubDate && b.pubDate) {
-      return b.pubDate.getTime() - a.pubDate.getTime();
-    }
-    return 0;
-  });
-}
-
-// Get publication data from cache
-const papers = getPublicationData(limitedDois);
-const hasMissingData = papers.some(p => p.title === "Publication details loading...");
+// Limit the total number of publications we'll handle
+const limitedPubs = publications.slice(0, maxItems);
 
 // Format date helper function
 function formatDate(date) {
   if (!date) return "";
-  if (isNaN(date.getTime())) return "";
+  const parsedDate = date instanceof Date ? date : new Date(date);
+  if (isNaN(parsedDate.getTime())) return "";
   
-  return date.toLocaleDateString('en-US', {
+  return parsedDate.toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'short'
   });
 }
+
+// Get year from a publication
+function getPublicationYear(dateStr) {
+  // Ensure dateStr is a string before using string methods
+  if (dateStr === null || dateStr === undefined) {
+    return "Unknown Year";
+  }
+  
+  // If it's a Date object, convert to string
+  if (dateStr instanceof Date) {
+    return dateStr.getFullYear().toString();
+  }
+  
+  // Convert any non-string type to string
+  if (typeof dateStr !== 'string') {
+    dateStr = String(dateStr);
+  }
+  
+  // Now we can safely use match
+  const match = dateStr.match(/\b(19|20)\d{2}\b/);
+  if (match) {
+    return match[0];
+  }
+  
+  // Fallback: try to extract year from date string
+  try {
+    const date = new Date(dateStr);
+    if (!isNaN(date.getTime())) {
+      return date.getFullYear().toString();
+    }
+  } catch (e) {
+    console.error("Failed to parse date", e);
+  }
+  
+  return "Unknown Year";
+}
+
+// Calculate pagination info
+const totalItems = limitedPubs.length;
+const totalPages = Math.ceil(totalItems / itemsPerPage);
 ---
 
-<div class={`doi-paper-feed ${className}`}>
+<div class={`doi-paper-feed ${className}`} id="doi-paper-feed">
   {title && <h2>{title}</h2>}
   
-  {dois.length === 0 ? (
+  {limitedPubs.length === 0 ? (
     <p class="empty-message">No publications available.</p>
   ) : (
     <div>
-      <ul class="publication-list-home">
-        {papers.map(paper => (
-          <li class="publication-item-home" data-year={paper.pubYear}>
-            <h3 class="publication-title">{paper.title}</h3>
-            <p class="publication-authors">{paper.authors}</p>
-            {paper.venue && <p class="publication-venue">{paper.venue}</p>}
+      <ul class="publication-list-home" id="publication-list">
+        {limitedPubs.map((pub, index) => (
+          <li 
+            class="publication-item-home" 
+            data-year={getPublicationYear(pub)}
+            data-index={index}
+            data-pagination-page={Math.floor(index / itemsPerPage) + 1}
+            style={enablePagination && index >= itemsPerPage ? "display: none;" : ""}
+          >
+            <h3 class="publication-title">
+              {pub.data.manual_override?.citation || `Publication ${pub.data.doi}`}
+            </h3>
+            {pub.data.manual_override?.authors && (
+              <p class="publication-authors">
+                {Array.isArray(pub.data.manual_override.authors) 
+                  ? pub.data.manual_override.authors.join(", ")
+                  : pub.data.manual_override.authors}
+              </p>
+            )}
+            {pub.data.manual_override?.journal && (
+              <p class="publication-venue">{pub.data.manual_override.journal}</p>
+            )}
             <p class="publication-date">
-              {formatDate(paper.pubDate)}
-              {!paper.pubDate && paper.pubYear ? paper.pubYear : ""}
+              {pub.data.manual_override?.publication_date 
+                ? formatDate(pub.data.manual_override.publication_date)
+                : getPublicationYear(pub)}
             </p>
             <a 
-              href={`https://doi.org/${paper.doi}`} 
+              href={`https://doi.org/${pub.data.doi}`} 
               class="publication-link"
               target="_blank"
               rel="noopener noreferrer"
@@ -124,14 +135,26 @@ function formatDate(date) {
         ))}
       </ul>
       
-      <!-- Add results counter -->
-      <div class="publication-results-counter">
-        <p id="results-counter">Showing {papers.length} publications</p>
+      <!-- No results message placeholder -->
+      <p class="no-results-message" style="display: none;">
+        No publications found matching your search.
+      </p>
+      
+      <!-- Pagination Controls -->
+      <div class="pagination-controls">
+        <p class="pagination-info" id="pagination-counter">
+          Showing <span id="visible-count">{Math.min(itemsPerPage, totalItems)}</span> of <span id="total-count">{totalItems}</span> publications
+        </p>
+        {enablePagination && totalPages > 1 && (
+          <button id="load-more-btn" class="load-more-btn">
+            Load More Publications
+          </button>
+        )}
       </div>
     </div>
   )}
   
-  {showViewAllLink && dois.length > 0 && (
+  {showViewAllLink && publications.length > 0 && !enablePagination && (
     <div class="section-link">
       <LinkButton href={viewAllUrl}>
         All Publications
@@ -145,43 +168,205 @@ function formatDate(date) {
   )}
 </div>
 
-<script>
-  // Improved script that ensures publication year detection and layout stability
-  function enhancePublications() {
-    const publications = document.querySelectorAll('.publication-item-home');
-    
-    publications.forEach(pub => {
-      // Add year data from publication date if not already set
-      if (!pub.dataset.year) {
-        const dateEl = pub.querySelector('.publication-date');
-        if (dateEl) {
-          const text = dateEl.textContent || '';
-          const year = text.match(/\b(20\d{2})\b/);
-          if (year) {
-            pub.dataset.year = year[0];
+<script define:vars={{ itemsPerPage, totalItems, totalPages, enablePagination, searchInputId }}>
+  // Component initialization
+  (function() {
+    // Wait for DOM to be fully ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initializeComponent);
+    } else {
+      initializeComponent();
+    }
+
+    function initializeComponent() {
+      // Get component settings from data attributes
+      const feedElement = document.getElementById('doi-paper-feed');
+      if (!feedElement) return;
+      
+      // Component state
+      const state = {
+        currentPage: 1,
+        isSearching: false,
+        searchTerm: '',
+        visibleCount: Math.min(itemsPerPage, totalItems)
+      };
+
+      // Get DOM elements
+      const allItems = Array.from(document.querySelectorAll('.publication-item-home'));
+      const loadMoreBtn = document.getElementById('load-more-btn');
+      const noResultsMessage = document.querySelector('.no-results-message');
+      const paginationCounter = document.getElementById('pagination-counter');
+      
+      // Use 'let' instead of 'const' for elements that will be reassigned
+      let visibleCountEl = document.getElementById('visible-count');
+      let totalCountEl = document.getElementById('total-count');
+      
+      // Get search input if ID was provided
+      let searchInput = null;
+      let clearSearchBtn = null;
+      
+      if (searchInputId) {
+        searchInput = document.getElementById(searchInputId);
+        if (searchInput) {
+          // Find clear button if it exists
+          const parent = searchInput.parentElement;
+          if (parent) {
+            clearSearchBtn = parent.querySelector('button[title="Clear search"]');
           }
         }
       }
-    });
 
-    // Calculate ideal min height for container
-    const feedContainer = document.querySelector('.publications-complete-feed');
-    if (feedContainer) {
-      const minHeight = Math.max(500, feedContainer.offsetHeight);
-      feedContainer.style.minHeight = `${minHeight}px`;
+      // ===== SEARCH FUNCTIONALITY =====
+      
+      function performSearch(term) {
+        // Always clean the term
+        const searchTerm = (term || '').toLowerCase().trim();
+        
+        // Only update if the search term changed
+        if (searchTerm === state.searchTerm) return;
+        
+        // Update state
+        state.searchTerm = searchTerm;
+        state.isSearching = searchTerm !== '';
+        
+        // Count matches
+        let matchCount = 0;
+        
+        // Show or hide items based on search
+        allItems.forEach(item => {
+          const titleElement = item.querySelector('.publication-title');
+          const authorElement = item.querySelector('.publication-authors');
+          
+          if (!titleElement) return;
+          
+          const title = titleElement.textContent.toLowerCase();
+          const authors = authorElement ? authorElement.textContent.toLowerCase() : '';
+          
+          // An item matches if the search term is empty or found in title/authors
+          const matches = !state.isSearching || 
+                         title.includes(searchTerm) ||
+                         authors.includes(searchTerm);
+                         
+          // Store match status directly on the element
+          item.dataset.matches = matches ? 'true' : 'false';
+          
+          // Show matching items, hide non-matching
+          if (state.isSearching) {
+            // When searching, show all matches regardless of pagination
+            item.style.display = matches ? '' : 'none';
+            
+            if (matches) matchCount++;
+          } else {
+            // When not searching, restore pagination visibility
+            const pageNum = parseInt(item.dataset.paginationPage || '1', 10);
+            item.style.display = (pageNum <= state.currentPage) ? '' : 'none';
+          }
+        });
+        
+        // Show/hide no results message
+        if (noResultsMessage) {
+          noResultsMessage.style.display = (state.isSearching && matchCount === 0) ? 'block' : 'none';
+        }
+        
+        // Update pagination controls
+        if (paginationCounter) {
+          if (state.isSearching) {
+            paginationCounter.innerHTML = `Found <span>${matchCount}</span> of ${totalItems} publications matching "${searchTerm}"`;
+          } else {
+            updatePaginationCounter();
+          }
+        }
+        
+        // Show/hide load more button
+        if (loadMoreBtn) {
+          loadMoreBtn.style.display = (state.isSearching || state.currentPage >= totalPages) ? 'none' : '';
+        }
+        
+        return matchCount;
+      }
+      
+      // ===== PAGINATION FUNCTIONALITY =====
+      
+      function loadMoreItems() {
+        // Don't do anything if searching
+        if (state.isSearching) return;
+        
+        // Increment page
+        state.currentPage++;
+        
+        // Calculate how many items to show
+        state.visibleCount = Math.min(state.currentPage * itemsPerPage, totalItems);
+        
+        // Show items from the next page
+        allItems.forEach(item => {
+          const pageNum = parseInt(item.dataset.paginationPage || '1', 10);
+          if (pageNum === state.currentPage) {
+            item.style.display = '';
+          }
+        });
+        
+        // Update counter
+        updatePaginationCounter();
+        
+        // Hide button if we're at the last page
+        if (loadMoreBtn && state.currentPage >= totalPages) {
+          loadMoreBtn.style.display = 'none';
+        }
+      }
+      
+      function updatePaginationCounter() {
+        if (!visibleCountEl || !paginationCounter) return;
+        
+        // Update the visible count
+        visibleCountEl.textContent = state.visibleCount;
+        
+        // Make sure the counter shows "Showing X of Y publications"
+        if (!state.isSearching) {
+          paginationCounter.innerHTML = `Showing <span id="visible-count">${state.visibleCount}</span> of <span id="total-count">${totalItems}</span> publications`;
+          // Re-query elements after innerHTML change (no error now since we used 'let')
+          visibleCountEl = document.getElementById('visible-count');
+          totalCountEl = document.getElementById('total-count');
+        }
+      }
+      
+      // ===== EVENT LISTENERS =====
+      
+      // Set up search input event listeners
+      if (searchInput) {
+        // Listen for input changes
+        searchInput.addEventListener('input', () => {
+          performSearch(searchInput.value);
+        });
+        
+        // Listen for Enter key
+        searchInput.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            performSearch(searchInput.value);
+          }
+        });
+        
+        // Set up clear button
+        if (clearSearchBtn) {
+          clearSearchBtn.addEventListener('click', () => {
+            searchInput.value = '';
+            performSearch('');
+            searchInput.focus();
+          });
+        }
+        
+        // Initial search if there's a value
+        if (searchInput.value) {
+          performSearch(searchInput.value);
+        }
+      }
+      
+      // Set up load more button
+      if (loadMoreBtn) {
+        loadMoreBtn.addEventListener('click', loadMoreItems);
+      }
     }
-
-    // Signal that publications are ready for filtering
-    document.dispatchEvent(new CustomEvent('publications-loaded'));
-  }
-
-  // Run enhancement when DOM is loaded
-  document.addEventListener('DOMContentLoaded', enhancePublications);
-
-  // Also try running it now in case DOM is already ready
-  if (document.readyState === 'interactive' || document.readyState === 'complete') {
-    enhancePublications();
-  }
+  })();
 </script>
 
 <style>
@@ -286,5 +471,49 @@ function formatDate(date) {
     padding: 0.75rem;
     border-radius: 0.25rem;
     margin-top: 1rem;
+  }
+
+  /* Pagination Controls */
+  .pagination-controls {
+    margin-top: 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+  }
+  
+  .pagination-info {
+    font-size: 0.9rem;
+    color: rgba(var(--color-text-base), 0.8);
+    text-align: center;
+  }
+  
+  .load-more-btn {
+    background-color: rgb(var(--color-accent));
+    color: rgb(var(--color-card));
+    border: none;
+    border-radius: 0.25rem;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+  
+  .load-more-btn:hover {
+    background-color: rgba(var(--color-accent), 0.8);
+  }
+  
+  .load-more-btn:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(var(--color-accent), 0.3);
+  }
+  
+  .no-results-message {
+    text-align: center;
+    padding: 1.5rem;
+    color: rgba(var(--color-text-base), 0.7);
+    font-style: italic;
   }
 </style>

@@ -17,6 +17,10 @@ const featuredProjects = projects
   .sort((a, b) => new Date(b.data.startDate).valueOf() - new Date(a.data.startDate).valueOf())
   .slice(0, 3);
 
+// Get all projects, not just featured ones
+const allProjects = projects
+  .sort((a, b) => new Date(b.data.startDate).valueOf() - new Date(a.data.startDate).valueOf());
+
 // Get team members
 const teamMembers = await getCollection("team");
 
@@ -56,110 +60,38 @@ const sortedTeamMembers = teamMembers
     return a.data.name.localeCompare(b.data.name);
   });
 
-// Get top 6 team members after sorting
+// Get top 12 team members after sorting
 const displayTeamMembers = sortedTeamMembers.slice(0, 12);
 
-// Get publications with improved sorting logic to guarantee newest papers appear
+// Get publications with improved sorting logic
 const publications = await getCollection("publications");
 
-// Log publication dates to help debug
-console.log("Available publication dates:");
-publications.forEach(pub => {
-  const date = pub.data.manual_override?.publication_date || 
-               pub.data.publicationDate || 
-               pub.data.date;
-  if (date) {
-    console.log(`${pub.data.doi}: ${date}`);
-  }
-});
-
-// Extract year from various date formats
-function getPublicationYear(pub) {
-  const dateStr = pub.data.manual_override?.publication_date || 
-                 pub.data.publicationDate || 
-                 pub.data.date;
-  
-  if (dateStr) {
-    // Try to extract year from date string
-    const yearMatch = dateStr.match(/\b(20\d\d)\b/);
-    if (yearMatch) return yearMatch[0];
-  }
-  
-  // Fall back to DOI-based year extraction
-  if (pub.data.doi) {
-    const doiYearMatch = pub.data.doi.match(/\b(20\d\d)\b/);
-    if (doiYearMatch) return doiYearMatch[0];
-  }
-  
-  return null;
-}
-
 // Sort publications: newest first, with featured at the top
-const sortedPubs = publications
-  .filter(pub => pub.data.doi)
-  .map(pub => ({
-    doi: pub.data.doi,
-    featured: pub.data.featured || false,
-    year: getPublicationYear(pub),
-    dateObj: (() => {
-      const dateStr = pub.data.manual_override?.publication_date || 
-                     pub.data.publicationDate || 
-                     pub.data.date;
-      if (dateStr) {
-        try {
-          return new Date(dateStr);
-        } catch (e) {
-          return null;
-        }
-      }
-      return null;
-    })()
-  }))
+const sortedPublications = publications
+  .filter(pub => !pub.data.draft)
   .sort((a, b) => {
     // Featured publications first
-    if (a.featured && !b.featured) return -1;
-    if (!a.featured && b.featured) return 1;
+    if (a.data.featured && !b.data.featured) return -1;
+    if (!a.data.featured && b.data.featured) return 1;
     
-    // Then by explicit year if available
-    if (a.year && b.year && a.year !== b.year) {
-      return parseInt(b.year) - parseInt(a.year);
-    }
-    
-    // Then by date object if available
-    if (a.dateObj && b.dateObj && !isNaN(a.dateObj) && !isNaN(b.dateObj)) {
-      return b.dateObj.getTime() - a.dateObj.getTime();
-    }
-    
-    return 0;
+    // Then by publication date
+    const dateA = a.data.manual_override?.publication_date 
+      ? new Date(a.data.manual_override.publication_date) 
+      : new Date(0);
+    const dateB = b.data.manual_override?.publication_date 
+      ? new Date(b.data.manual_override.publication_date) 
+      : new Date(0);
+      
+    // Sort newest first
+    return dateB.getTime() - dateA.getTime();
   });
-
-// Now extract just the DOIs
-const sortedDois = sortedPubs.map(pub => pub.doi);
-
-// Log the final sort order to help debug
-console.log("Publication sort order on home page:");
-sortedPubs.slice(0, 10).forEach((pub, i) => {
-  console.log(`${i+1}. ${pub.doi} - Year: ${pub.year} - Featured: ${pub.featured}`);
-});
 
 const socialCount = SOCIALS.filter(social => social.active).length;
-
-// Format date helper
-function formatDate(date) {
-  if (!date) return "";
-  const parsedDate = date instanceof Date ? date : new Date(date);
-  if (isNaN(parsedDate.getTime())) return "";
-  
-  return parsedDate.toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'short'
-  });
-}
 ---
 
 <Layout>
   <Header />
-  <main id="main-content" class="irl-ct-main">
+  <main id="main-content" class="irl-ct-main mx-auto w-full max-w-7xl px-4 pb-12">
     <section id="hero" class="irl-ct-hero">
       <div class="hero-content">
         <h1>Interaction Research Lab</h1>
@@ -170,11 +102,13 @@ function formatDate(date) {
           The Interaction Research Lab explores the intersection of human behavior, 
           technology, and design to create more intuitive, accessible, and meaningful interactions at all scales, from face-to-face encounters to city-scale phenomena.
         </p>
+        <!-- 
         <div class="hero-buttons">
           <a href="/projects/" class="secondary-button">
             View Projects
           </a>
         </div>
+        -->
       </div>
       <div class="hero-video-container">
         <iframe 
@@ -192,38 +126,24 @@ function formatDate(date) {
     <div class="main-with-sidebar-layout">
       <div class="main-content">
         <section id="featured-projects">
-          <h2>Featured Research</h2>
-          <div class="project-list">
+          <h2>Projects</h2>
+          <div class="projects-grid">
             {
-              featuredProjects.map(project => (
-                <a href={`/projects/${project.slug}/`} class="project-card">
-                  <div class="project-image">
+              allProjects.map(project => (
+                <a href={`/projects/${project.slug}/`} class="project-square">
+                  <div class="project-square-image">
                     {project.data.image ? (
                       <img src={project.data.image.src} alt={project.data.title} />
                     ) : (
                       <div class="project-image-placeholder"></div>
                     )}
                   </div>
-                  <div class="project-card-content">
-                    <h3>{project.data.title}</h3>
-                    <p>{project.data.summary}</p>
-                  </div>
+                  <h3 class="project-square-title">{project.data.title}</h3>
                 </a>
               ))
             }
           </div>
-          <div class="section-link">
-            <LinkButton href="/projects/">
-              All Projects
-              <svg xmlns="http://www.w3.org/2000/svg"
-                ><path
-                  d="m11.293 17.293 1.414 1.414L19.414 12l-6.707-6.707-1.414 1.414L15.586 11H6v2h9.586z"
-                ></path>
-              </svg>
-            </LinkButton>
-          </div>
         </section>
-
 
         <section id="team-members">
           <h2>Research Team</h2>
@@ -276,10 +196,10 @@ function formatDate(date) {
       <div class="sidebar">
         <aside class="publications-sidebar">
           <DoiPaperFeed 
-            dois={sortedDois} 
+            publications={sortedPublications} 
             title="Recent Publications" 
             viewAllUrl="/publications/"
-            maxItems={6}  <!-- Increased from 5 to 6 to ensure newest are visible -->
+            maxItems={6}
           />
         </aside>
       </div>

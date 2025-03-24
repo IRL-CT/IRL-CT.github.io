@@ -4,10 +4,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import slugify from 'slugify';
-import { 
-  getPublicationFromCache,
-  isPublicationCached,
-} from '../utils/publicationCache.js';
+// Remove cache imports
 import { fetchPublicationMetadata } from './updatePublicationCache.js';
 
 // ES Module way to check if file is being run directly
@@ -70,19 +67,11 @@ async function generatePublicationFile(rawInput) {
     fs.mkdirSync(PUBLICATIONS_DIR, { recursive: true });
   }
 
-  let metadata;
-  
-  // First check if it's in the cache
-  if (isPublicationCached(doi)) {
-    metadata = getPublicationFromCache(doi);
-    console.log(`Using cached data for DOI: ${doi}`);
-  } else {
-    // If not in cache, fetch from API
-    metadata = await fetchPublicationMetadata(doi);
-    if (!metadata) {
-      console.error(`Failed to fetch metadata for DOI: ${doi}`);
-      return false;
-    }
+  // Always fetch from API, no caching
+  const metadata = await fetchPublicationMetadata(doi);
+  if (!metadata) {
+    console.error(`Failed to fetch metadata for DOI: ${doi}`);
+    return false;
   }
 
   // Create a filename from the DOI (sanitize for filesystem)

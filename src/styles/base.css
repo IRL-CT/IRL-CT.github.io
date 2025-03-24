@@ -1,14 +1,21 @@
+@import './fonts.css';
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+
 @layer base {
+  html { 
+    font-size: 14px; 
+    overflow-y: scroll;
+  }
+
   :root,
   html[data-theme="light"] {
     /* Cornell Light Theme */
     --color-fill: 250, 250, 249;           /* Off-white background */
     --color-text-base: 51, 51, 51;         /* Dark gray text */
-    --color-accent: 37, 128, 174;           /* Blue color of desks in lab */
+    --color-accent: 58, 140, 182;           /* Blue color of desks in lab */
     --color-accent-dark: 150, 22, 22;      /* Darker Cornell Red */
     --color-card: 242, 242, 242;           /* Light gray card background */
     --color-card-muted: 224, 224, 224;     /* Muted gray for card accents */
@@ -57,7 +64,7 @@
   }
   
   body {
-    @apply flex min-h-[100svh] flex-col bg-skin-fill font-sans text-skin-base selection:bg-skin-accent/70 selection:text-skin-inverted;
+    @apply flex min-h-[100svh] flex-col bg-skin-fill font-gt-america-regular text-skin-base selection:bg-skin-accent/70 selection:text-skin-inverted;
   }
   
   section,
@@ -160,7 +167,6 @@
   
   /* Main Content */
   .irl-ct-main {
-    max-width: 1200px;
     margin: 0 auto;
     padding: 0 1.5rem;
   }
@@ -550,6 +556,63 @@
   /* Specific style for search page */
   .search-heading {
     @apply mt-8 mb-6; /* Add more top margin for search page heading */
+  }
+
+  /* ===== Project Grid Layout ===== */
+  .projects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  /* Media queries for responsive grid */
+  @media (min-width: 640px) {
+    .projects-grid {
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .projects-grid {
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    }
+  }
+
+  .project-square {
+    text-decoration: none;
+    color: inherit;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .project-square:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+  }
+
+  .project-square-image {
+    aspect-ratio: 1/1; /* Makes it a perfect square */
+    width: 100%;
+    overflow: hidden;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    background-color: rgb(var(--color-card));
+  }
+
+  .project-square-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .project-square-title {
+    margin-top: 0.75rem;
+    font-size: 1rem;
+    font-weight: 600;
+    text-align: center;
   }
 }
 

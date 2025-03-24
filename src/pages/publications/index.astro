@@ -5,46 +5,34 @@ import Header from "@components/Header.astro";
 import Footer from "@components/Footer.astro";
 import DoiPaperFeed from "@components/DoiPaperFeed.astro";
 
-// Get publications DOIs
+// Get publications and sort them
 const publications = await getCollection("publications");
-const allDois = publications
-  .filter(pub => pub.data.doi)
-  .map(pub => pub.data.doi);
 
-// Additional metadata we can use from content files to avoid API rate limits
-const publicationsMeta = publications
-  .filter(pub => pub.data.doi)
-  .map(pub => ({
-    doi: pub.data.doi,
-    date: pub.data.manual_override?.publication_date,
-    featured: pub.data.featured
-  }));
-
-// Sort featured publications first, then by date if available
-const sortedDois = allDois.sort((a, b) => {
-  const metaA = publicationsMeta.find(p => p.doi === a);
-  const metaB = publicationsMeta.find(p => p.doi === b);
-  
-  // Sort featured first
-  if (metaA?.featured && !metaB?.featured) return -1;
-  if (!metaA?.featured && metaB?.featured) return 1;
-  
-  // Then sort by date if available
-  if (metaA?.date && metaB?.date) {
-    return new Date(metaB.date).getTime() - new Date(metaA.date).getTime();
-  }
-  
-  return 0;
-});
+// Sort featured publications first, then by date
+const sortedPublications = publications
+  .filter(pub => !pub.data.draft)
+  .sort((a, b) => {
+    // Featured publications first
+    if (a.data.featured && !b.data.featured) return -1;
+    if (!a.data.featured && b.data.featured) return 1;
+    
+    // Then by publication date
+    const dateA = a.data.manual_override?.publication_date 
+      ? new Date(a.data.manual_override.publication_date) 
+      : new Date(0);
+    const dateB = b.data.manual_override?.publication_date 
+      ? new Date(b.data.manual_override.publication_date) 
+      : new Date(0);
+      
+    // Sort newest first
+    return dateB.getTime() - dateA.getTime();
+  });
 ---
 
 <Layout title="Publications | IRL: Interaction Research Lab">
   <Header activeNav="publications" />
-  <div class="mx-auto max-w-6xl">
+  <div class="mx-auto mx-auto w-full max-w-5xl px-4 pb-12">
     <main id="main-content" class="publications-container">
-      <h1>Research Publications</h1>
-      <p class="page-description">
-      </p>
 
       <div class="search-container">
         <h2>Search Publications</h2>
@@ -61,11 +49,13 @@ const sortedDois = allDois.sort((a, b) => {
       
       <div class="publications-feed">
         <DoiPaperFeed 
-          dois={sortedDois} 
+          publications={sortedPublications} 
           title="All Publications" 
           showViewAllLink={false}
-          maxItems={100}
-          batchSize={2} // Reduce batch size to avoid rate limits
+          maxItems={500}
+          itemsPerPage={20}
+          enablePagination={true}
+          searchInputId="publication-search"
           className="publications-complete-feed"
         />
       </div>
@@ -73,182 +63,6 @@ const sortedDois = allDois.sort((a, b) => {
   </div>
   <Footer />
 </Layout>
-
-<script>
-  // Publication search functionality
-  function setupPublicationSearch() {
-    console.log("Setting up publication search");
-    const searchInput = document.getElementById('publication-search');
-    const clearSearchBtn = document.getElementById('clear-search');
-    const publicationsFeed = document.querySelector('.publications-complete-feed');
-    let publicationsLoaded = false;
-    
-    // Debug helper - log number of publications found
-    function logPublicationsStatus() {
-      const publications = document.querySelectorAll('.publication-item-home');
-      console.log(`Found ${publications.length} publications`);
-    }
-    
-    // Filter publications by search term
-    function filterPublicationsBySearch(searchTerm) {
-      console.log(`Filtering by search: "${searchTerm}"`);
-      const publications = document.querySelectorAll('.publication-item-home');
-      const resultsCounter = document.getElementById('results-counter');
-      
-      if (publications.length === 0) {
-        console.log("No publications found to filter");
-        return false;
-      }
-      
-      searchTerm = searchTerm.toLowerCase().trim();
-      let visibleCount = 0;
-      
-      publications.forEach(pub => {
-        const titleElement = pub.querySelector('.publication-title');
-        const authorElement = pub.querySelector('.publication-authors');
-        
-        // If no title element exists, skip this publication
-        if (!titleElement) return;
-        
-        const title = titleElement.textContent.toLowerCase();
-        const authors = authorElement ? authorElement.textContent.toLowerCase() : '';
-        
-        if (searchTerm === '' || 
-            title.includes(searchTerm) || 
-            authors.includes(searchTerm)) {
-          pub.style.display = '';
-          visibleCount++;
-        } else {
-          pub.style.display = 'none';
-        }
-      });
-      
-      console.log(`Showing ${visibleCount} of ${publications.length} publications`);
-      
-      // Update the results counter
-      if (resultsCounter) {
-        if (searchTerm === '') {
-          resultsCounter.textContent = `Showing ${publications.length} publications`;
-        } else {
-          resultsCounter.textContent = `Showing ${visibleCount} of ${publications.length} publications`;
-        }
-      }
-      
-      // Show a message if no publications match the filter
-      const noResultsMessage = document.querySelector('.no-results-message') || 
-        (() => {
-          const msg = document.createElement('p');
-          msg.className = 'no-results-message';
-          msg.textContent = 'No publications found matching your search.';
-          msg.style.textAlign = 'center';
-          msg.style.padding = '1rem';
-          msg.style.fontStyle = 'italic';
-          publicationsFeed?.appendChild(msg);
-          return msg;
-        })();
-      
-      noResultsMessage.style.display = visibleCount === 0 ? 'block' : 'none';
-      return true;
-    }
-    
-    // Try to apply search when publications are loaded
-    function tryApplySearch() {
-      if (publicationsLoaded || !searchInput) return;
-      
-      const publications = document.querySelectorAll('.publication-item-home');
-      if (publications.length === 0) {
-        console.log("No publications found yet, waiting...");
-        return;
-      }
-      
-      const success = filterPublicationsBySearch(searchInput.value);
-      if (success) {
-        publicationsLoaded = true;
-        console.log("Initial search applied successfully");
-      }
-    }
-    
-    // Set up event listeners
-    searchInput?.addEventListener('input', (e) => {
-      filterPublicationsBySearch(e.target.value);
-    });
-    
-    // Clear search button
-    clearSearchBtn?.addEventListener('click', () => {
-      if (searchInput) {
-        searchInput.value = '';
-        filterPublicationsBySearch('');
-        searchInput.focus();
-      }
-    });
-    
-    // Method 1: Watch for DOM changes to detect when publications are loaded
-    const observer = new MutationObserver(mutations => {
-      let shouldCheck = false;
-      
-      for (const mutation of mutations) {
-        if (mutation.addedNodes.length > 0) {
-          shouldCheck = true;
-          break;
-        }
-      }
-      
-      if (shouldCheck) {
-        console.log("DOM changed, checking for publications...");
-        logPublicationsStatus();
-        tryApplySearch();
-      }
-    });
-    
-    if (publicationsFeed) {
-      observer.observe(publicationsFeed, { 
-        childList: true, 
-        subtree: true,
-        characterData: true
-      });
-    }
-    
-    // Method 2: Periodically check for publications as a fallback
-    const checkInterval = setInterval(() => {
-      console.log("Interval check running...");
-      const publications = document.querySelectorAll('.publication-item-home');
-      if (publications.length > 0) {
-        logPublicationsStatus();
-        tryApplySearch();
-        
-        if (publicationsLoaded) {
-          console.log("Search applied, clearing interval");
-          clearInterval(checkInterval);
-        }
-      }
-    }, 500);
-    
-    // Clean up interval after 20 seconds to prevent infinite checking
-    setTimeout(() => {
-      if (checkInterval) {
-        console.log("Clearing interval after timeout");
-        clearInterval(checkInterval);
-      }
-    }, 20000);
-    
-    // Method 3: Try immediately in case publications are already loaded
-    console.log("Trying initial search immediately");
-    tryApplySearch();
-    
-    // Method 4: Listen for a custom event from DoiPaperFeed
-    document.addEventListener('publications-loaded', (e) => {
-      console.log("publications-loaded event received");
-      setTimeout(tryApplySearch, 100); // Small delay to ensure DOM is updated
-    });
-    
-    // Log initial status
-    logPublicationsStatus();
-  }
-  
-  // Run the setup immediately and also when DOM is ready
-  setupPublicationSearch();
-  document.addEventListener('DOMContentLoaded', setupPublicationSearch);
-</script>
 
 <style>
   .publications-container {
