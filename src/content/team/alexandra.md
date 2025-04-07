@@ -18,7 +18,7 @@ research_interests:
 education:
     - degree: "MS in Information Science"
       institution: "Cornell University"
-      year: 2024
+      year: 2023
     - degree: "MS in Artificial Intelligence"
       institution: "Utrecht University"
       year: 2018
