@@ -18,11 +18,11 @@ research_interests:
 education:
     - degree: "MS in Information Science"
       institution: "Cornell University"
-      year: "2024"
+      year: 2024
     - degree: "MS in Artificial Intelligence"
       institution: "Utrecht University"
-      year: "2018"
+      year: 2018
     - degree: "BS in Industrial Design"
       institution: "TU Eindhoven"
-      year: "2016"
+      year: 2016
 ---
