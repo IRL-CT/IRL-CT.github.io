@@ -14,6 +14,7 @@ export interface Props {
   enableSearch?: boolean;
   searchInputId?: string;
   hideTitle?: boolean;
+  hidePaginationInfo?: boolean; // New prop to hide pagination info
 }
 
 const { 
@@ -27,7 +28,8 @@ const {
   enablePagination = false,
   enableSearch = false,
   searchInputId = "",
-  hideTitle = false
+  hideTitle = false,
+  hidePaginationInfo = false // Default to showing pagination info
 } = Astro.props;
 
 // Limit the total number of publications we'll handle
@@ -144,9 +146,11 @@ const totalPages = Math.ceil(totalItems / itemsPerPage);
       
       <!-- Pagination Controls -->
       <div class="pagination-controls">
-        <p class="pagination-info" id="pagination-counter">
-          Showing <span id="visible-count">{Math.min(itemsPerPage, totalItems)}</span> of <span id="total-count">{totalItems}</span> publications
-        </p>
+        {!hidePaginationInfo && (
+          <p class="pagination-info" id="pagination-counter">
+            Showing <span id="visible-count">{Math.min(itemsPerPage, totalItems)}</span> of <span id="total-count">{totalItems}</span> publications
+          </p>
+        )}
         {enablePagination && totalPages > 1 && (
           <button id="load-more-btn" class="load-more-btn">
             Load More Publications
@@ -170,7 +174,7 @@ const totalPages = Math.ceil(totalItems / itemsPerPage);
   )}
 </div>
 
-<script define:vars={{ itemsPerPage, totalItems, totalPages, enablePagination, searchInputId }}>
+<script define:vars={{ itemsPerPage, totalItems, totalPages, enablePagination, searchInputId, hidePaginationInfo }}>
   // Component initialization
   (function() {
     // Wait for DOM to be fully ready
@@ -317,7 +321,7 @@ const totalPages = Math.ceil(totalItems / itemsPerPage);
       }
       
       function updatePaginationCounter() {
-        if (!visibleCountEl || !paginationCounter) return;
+        if (!visibleCountEl || !paginationCounter || hidePaginationInfo) return;
         
         // Update the visible count
         visibleCountEl.textContent = state.visibleCount;

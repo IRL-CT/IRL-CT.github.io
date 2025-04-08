@@ -1,6 +1,6 @@
 ---
 name: "Urban Tech Hub"
-website: "https://tech.cornell.edu/urban-tech-hub/"
+website: "https://urban.tech.cornell.edu/"
 logo: "ct-uth.jpg"
 active: true
 startDate: "2022-01-01"

@@ -180,7 +180,7 @@ const socialCount = SOCIALS.filter(social => social.active).length;
       <!-- Projects header with proper section structure -->
       <section class="irl-ct-hero content-container">
         <div class="hero-column team-content-column">
-          <div class="column-header">
+          <div id="projects-header" class="column-header">
             <h2>Projects</h2>
           </div>
         </div>
@@ -265,7 +265,8 @@ const socialCount = SOCIALS.filter(social => social.active).length;
               publications={sortedPublications} 
               viewAllUrl="/publications/"
               maxItems={3}
-              hideTitle={true} /* Explicitly set to true to ensure the title is hidden */
+              hideTitle={true}
+              hidePaginationInfo={true} /* Hide the pagination counter on home page */
             />
           </div>
         </div>
@@ -292,14 +293,6 @@ const socialCount = SOCIALS.filter(social => social.active).length;
                   </a>
                 ))
               }
-            </div>
-            <div class="section-link">
-              <LinkButton href="/media/">
-                View All Press
-                <svg xmlns="http://www.w3.org/2000/svg">
-                  <path d="m11.293 17.293 1.414 1.414L19.414 12l-6.707-6.707-1.414 1.414L15.586 11H6v2h9.586z"></path>
-                </svg>
-              </LinkButton>
             </div>
           </div>
         </div>
@@ -337,14 +330,6 @@ const socialCount = SOCIALS.filter(social => social.active).length;
                 ))
               }
             </div>
-            <div class="section-link">
-              <LinkButton href="/videos/">
-                View All Videos
-                <svg xmlns="http://www.w3.org/2000/svg">
-                  <path d="m11.293 17.293 1.414 1.414L19.414 12l-6.707-6.707-1.414 1.414L15.586 11H6v2h9.586z"></path>
-                </svg>
-              </LinkButton>
-            </div>
           </div>
         </div>
         
@@ -379,14 +364,6 @@ const socialCount = SOCIALS.filter(social => social.active).length;
                   </a>
                 ))
               }
-            </div>
-            <div class="section-link">
-              <LinkButton href="/collaborators/">
-                All Collaborators
-                <svg xmlns="http://www.w3.org/2000/svg">
-                  <path d="m11.293 17.293 1.414 1.414L19.414 12l-6.707-6.707-1.414 1.414L15.586 11H6v2h9.586z"></path>
-                </svg>
-              </LinkButton>
             </div>
           </div>
         </div>

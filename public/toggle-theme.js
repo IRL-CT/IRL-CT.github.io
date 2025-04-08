@@ -18,20 +18,31 @@ function getPreferTheme() {
 
 let themeValue = getPreferTheme();
 
-// Store the visual theme users actually see - always use "light" for visual styling
-const visualTheme = "light";
-
 function setPreference() {
   localStorage.setItem("theme", themeValue);
   reflectPreference();
 }
 
 function reflectPreference() {
-  // Apply consistent visual styling regardless of theme selection 
-  document.firstElementChild.setAttribute("data-theme", visualTheme);
+  // Apply the actual theme value selected by the user
+  document.firstElementChild.setAttribute("data-theme", themeValue);
 
-  // Keep correct aria label for accessibility
+  // Set correct aria label for accessibility
   document.querySelector("#theme-btn")?.setAttribute("aria-label", themeValue);
+  
+  // Update theme button appearance based on current theme
+  const moonIcon = document.querySelector("#moon-svg");
+  const sunIcon = document.querySelector("#sun-svg");
+  
+  if (moonIcon && sunIcon) {
+    if (themeValue === "dark") {
+      moonIcon.classList.add("hidden");
+      sunIcon.classList.remove("hidden");
+    } else {
+      sunIcon.classList.add("hidden");
+      moonIcon.classList.remove("hidden");
+    }
+  }
 
   // Get a reference to the body element
   const body = document.body;

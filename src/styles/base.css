@@ -204,18 +204,18 @@
 
   @media (min-width: 1024px) {
     header {
-      padding-left: var(--page-margin-large);
-      padding-right: var(--page-margin-large);
+      padding-left: 5rem;
+      padding-right: 5rem;
     }
   }
 
   /* Simple header divider that's properly placed */
   .header-divider {
-    width: 100%;
+    width: 80%; /* Reduced from 100% to make it slightly shorter */
     border: none;
     height: 1px;
-    background-color: rgba(var(--color-border), 0.8);
-    margin: 0;
+    background-color: black;
+    margin: 0 auto; /* Center the divider */
   }
 
   /* Remove any conflicting header styles */
@@ -375,4 +375,117 @@
     outline: 3px solid var(--color-accent);
     outline-offset: 2px;
   }
+
+  /* ===== Header Styles ===== */
+  #skip-to-content {
+    @apply absolute -top-full left-16 z-50 bg-skin-accent px-3 py-2 text-skin-inverted transition-all focus:top-4;
+  }
+  
+  .nav-container {
+    @apply w-full;
+  }
+  
+  .header-content {
+    @apply flex items-center justify-between p-4 sm:py-8;
+    position: relative; /* Support absolute positioning of the middle divider */
+  }
+  
+  .logo {
+    @apply py-1 text-xl font-semibold sm:text-2xl z-10 pr-1;
+  }
+  
+  .hamburger-menu {
+    @apply self-end p-2 sm:hidden;
+  }
+  
+  .hamburger-menu svg {
+    @apply h-6 w-6 scale-125 fill-skin-base;
+  }
+
+  nav {
+    @apply flex items-center sm:justify-end sm:space-x-4 sm:py-0 z-10;
+  }
+  
+  /* Mobile menu styling */
+  nav ul {
+    @apply hidden sm:flex sm:items-center sm:mt-0 sm:w-auto;
+  }
+  
+  /* Mobile menu when visible */
+  nav ul.display-nav {
+    @apply fixed top-16 left-0 right-0 grid w-full grid-cols-2 grid-rows-4 bg-skin-fill p-6 shadow-lg z-50;
+    gap: 1rem;
+  }
+  
+  nav ul li {
+    @apply col-span-2 flex items-center justify-center;
+  }
+  
+  nav ul li a {
+    @apply w-full px-4 py-3 text-center font-semibold hover:text-skin-accent sm:my-0 sm:px-2 sm:py-1;
+  }
+  
+  nav ul li:nth-last-child(2) a {
+    @apply w-auto;
+  }
+  
+  nav ul li:nth-last-child(1),
+  nav ul li:nth-last-child(2) {
+    @apply col-span-1;
+  }
+  
+  nav .active {
+    @apply underline decoration-wavy decoration-2 underline-offset-4;
+  }
+  
+  nav a.active svg {
+    @apply fill-skin-accent;
+  }
+
+  nav button {
+    @apply p-1;
+  }
+  
+  nav button svg {
+    @apply h-6 w-6 fill-skin-base hover:fill-skin-accent;
+  }
+  
+  #theme-btn {
+    @apply p-3 sm:p-1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  #theme-btn svg {
+    @apply scale-125 hover:rotate-12 sm:scale-100;
+    min-height: 24px; /* Ensure minimum height */
+    min-width: 24px; /* Ensure minimum width */
+  }
+
+  .menu-icon line {
+    @apply transition-opacity duration-75 ease-in-out;
+  }
+  
+  .menu-icon .close {
+    opacity: 0;
+  }
+  
+  .menu-icon.is-active .line {
+    @apply opacity-0;
+  }
+  
+  .menu-icon.is-active .close {
+    @apply opacity-100;
+  }
+
+  /* Additional styling to handle menu backdrop */
+  .menu-backdrop {
+    @apply hidden fixed inset-0 bg-black bg-opacity-50 z-40;
+  }
+  
+  .menu-backdrop.is-active {
+    @apply block;
+  }
+
 }

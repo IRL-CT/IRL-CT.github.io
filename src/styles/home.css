@@ -444,7 +444,7 @@
   -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
   scrollbar-width: thin;
   padding: 0; /* Remove existing padding */
-  margin: 1rem 0; /* Replace the negative margin with a positive one */
+  margin: 0rem 0; /* Replace the negative margin with a positive one */
 }
 
 @media (min-width: 768px) {
@@ -483,12 +483,12 @@
 
 .project-scroll-item {
   flex: 0 0 auto;
-  width: 280px;
+  width: 200px;
   text-decoration: none;
   color: inherit;
   transition: transform 0.2s ease;
-  border-radius: 8px;
   overflow: hidden;
+  border-color: black;
 }
 
 .project-scroll-item:hover {
@@ -499,26 +499,26 @@
   height: 200px;
   overflow: hidden;
   border-radius: 8px;
-  background-color: #f8f8f8;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  background-color: black;
+  border-width: 4px;
 }
 
 .project-square-image img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain; /* Changed from 'cover' to 'contain' to prevent clipping */
 }
 
 .project-square-title {
   margin-top: 0.75rem;
   margin-bottom: 0.25rem;
-  font-size: 1.1rem;
-  font-weight: 600;
-  line-height: 1.4;
+  font-size: 1rem;
+  font-weight: 550;
+  text-align: left; /* Changed from center to left */
 }
 
 .project-square-year {
-  text-align: center;
+  text-align: left;
   margin-top: 0.25rem;
   font-size: 0.85rem;
   color: rgba(var(--color-text-base), 0.7);
@@ -552,62 +552,6 @@
   }
 }
 
-header {
-  padding-left: var(--page-margin-small);
-  padding-right: var(--page-margin-small);
-  position: relative;
-}
-
-@media (min-width: 768px) {
-  header {
-    padding-left: var(--page-margin-medium);
-    padding-right: var(--page-margin-medium);
-  }
-}
-
-@media (min-width: 1024px) {
-  header {
-    padding-left: var(--page-margin-large);
-    padding-right: var(--page-margin-large);
-  }
-}
-
-.header-divider {
-  width: 100%;
-  border: none;
-  height: 1px;
-  background-color: rgba(var(--color-border), 0.8);
-  margin: 0;
-}
-
-.header-line-container, 
-.header-line,
-header hr:not(.header-divider),
-header .divider {
-  display: none;
-}
-
-.header-line-container {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  width: 100%;
-  overflow: hidden;
-}
-
-.header-line {
-  height: 1px;
-  background-color: rgba(var(--color-border), 0.8);
-  margin: 0;
-  width: 100%;
-}
-
-header hr,
-header .divider {
-  display: none; /* Hide any old dividers */
-}
-
 .content-container {
   max-width: var(--content-max-width);
   margin-left: 0; /* Ensure consistent left alignment */
@@ -623,12 +567,16 @@ header .divider {
   color: rgb(var(--color-accent));
 }
 
+#projects-header { 
+  margin-bottom: -3rem; /* Reduce bottom margin */
+}
+
 #top-hero .column-header {
   border-bottom: none;
 }
 
 .column-header h2 {
-  font-size: 1.8rem;
+  font-size: 1.3rem;
   font-weight: 600;
   color: rgb(var(--color-accent));
   margin: 0;
@@ -644,6 +592,7 @@ header .divider {
 }
 
 .publications-column .column-content {
+  margin-top: -0.5rem;
   height: auto;
 }
 
@@ -774,6 +723,7 @@ header .divider {
   list-style: none;
   padding: 0;
   margin: 0;
+  margin-top: -1.75rem !important;
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
@@ -832,6 +782,7 @@ header .divider {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+  margin-top: -1.5rem !important;
 }
 
 .video-item {
@@ -922,6 +873,7 @@ header .divider {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 1.25rem;
+  margin-top: -1.5rem !important;
 }
 
 .collaborator-item {
@@ -938,10 +890,10 @@ header .divider {
   aspect-ratio: 1 / 0.75;
 }
 
-.collaborator-item:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  border-color: rgba(var(--color-border), 0.8);
+@media (min-width: 640px) {
+  .collaborators-list {
+    gap: 1.5rem; /* Slightly larger gap on bigger screens */
+  }
 }
 
 .collaborator-logo {
@@ -977,13 +929,6 @@ header .divider {
   color: #64748b;
   font-size: 2rem;
   font-weight: 600;
-}
-
-/* Responsive adjustments */
-@media (min-width: 640px) {
-  .collaborators-list {
-    grid-template-columns: repeat(3, 1fr);
-  }
 }
 
 /* Remove old conflicting styles */
