@@ -110,4 +110,57 @@ const publications = defineCollection({
   }),
 });
 
-export const collections = { blog, projects, team, publications };
+// Media collection for press coverage
+const media = defineCollection({
+  type: "content_layer",
+  loader: glob({ pattern: "**/*.md", base: "./src/content/media" }),
+  schema: z.object({
+    title: z.string(),
+    source: z.string(), // Publication/outlet name
+    pubDate: z.date(),
+    url: z.string().url(),
+    featured: z.boolean().optional(),
+    description: z.string(),
+    projectIds: z.array(z.string()).optional(), // References to related projects
+    tags: z.array(z.string()).default(["press"]),
+  }),
+});
+
+// Collaborator collection for partner organizations
+const collaborators = defineCollection({
+  type: "content_layer",
+  loader: glob({ pattern: "**/*.md", base: "./src/content/collaborators" }),
+  schema: ({ image }) =>
+    z.object({
+      name: z.string(),
+      website: z.string().url(),
+      logo: image(),
+      description: z.string().optional(),
+      active: z.boolean().default(true),
+      startDate: z.string(),
+      endDate: z.string().optional(),
+      projectIds: z.array(z.string()).optional(), // References to related projects
+      contactPerson: z.string().optional(), // Contact person at the collaborating organization
+      location: z.string().optional(), // Location/address of collaborator
+      type: z.enum(["academic", "industry", "government", "nonprofit", "other"]).optional(),
+    }),
+});
+
+// Videos collection for YouTube content
+const videos = defineCollection({
+  type: "content_layer",
+  loader: glob({ pattern: "**/*.md", base: "./src/content/videos" }),
+  schema: z.object({
+    title: z.string(),
+    youtubeId: z.string(),
+    publishedAt: z.date(),
+    description: z.string(),
+    thumbnailUrl: z.string().url().optional(),
+    duration: z.string().optional(), // Format: "PT1H2M3S" (1 hour, 2 minutes, 3 seconds)
+    featured: z.boolean().optional().default(false),
+    projectIds: z.array(z.string()).optional(), // References to related projects
+    tags: z.array(z.string()).default(["video"]),
+  }),
+});
+
+export const collections = { blog, projects, team, publications, media, collaborators, videos };

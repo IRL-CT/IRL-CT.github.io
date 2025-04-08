@@ -13,6 +13,7 @@ export interface Props {
   enablePagination?: boolean;
   enableSearch?: boolean;
   searchInputId?: string;
+  hideTitle?: boolean;
 }
 
 const { 
@@ -25,7 +26,8 @@ const {
   itemsPerPage = 20,
   enablePagination = false,
   enableSearch = false,
-  searchInputId = ""
+  searchInputId = "",
+  hideTitle = false
 } = Astro.props;
 
 // Limit the total number of publications we'll handle
@@ -85,7 +87,7 @@ const totalPages = Math.ceil(totalItems / itemsPerPage);
 ---
 
 <div class={`doi-paper-feed ${className}`} id="doi-paper-feed">
-  {title && <h2>{title}</h2>}
+  {hideTitle !== true && <h2>{title}</h2>}
   
   {limitedPubs.length === 0 ? (
     <p class="empty-message">No publications available.</p>

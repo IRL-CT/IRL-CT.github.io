@@ -4,7 +4,6 @@ import Layout from "@layouts/Layout.astro";
 import Header from "@components/Header.astro";
 import Footer from "@components/Footer.astro";
 import LinkButton from "@components/LinkButton.astro";
-import Hr from "@components/Hr.astro";
 import Socials from "@components/Socials.astro";
 import DoiPaperFeed from "@components/DoiPaperFeed.astro";
 import { SITE, SOCIALS } from "@config";
@@ -40,7 +39,7 @@ const roleOrder = [
   "Collaborator"
 ];
 
-// Sort team members by role priority and then by name
+// Sort team members by role priority and then by last name
 const sortedTeamMembers = teamMembers
   .filter(member => member.data.featured !== false)
   .sort((a, b) => {
@@ -56,8 +55,10 @@ const sortedTeamMembers = teamMembers
       return aIndex - bIndex;
     }
     
-    // If same role, sort by name
-    return a.data.name.localeCompare(b.data.name);
+    // If same role, sort by last name
+    const aLastName = a.data.name.split(' ').pop();
+    const bLastName = b.data.name.split(' ').pop();
+    return aLastName.localeCompare(bLastName);
   });
 
 // Get top 12 team members after sorting
@@ -78,7 +79,7 @@ const sortedPublications = publications
     const dateA = a.data.manual_override?.publication_date 
       ? new Date(a.data.manual_override.publication_date) 
       : new Date(0);
-    const dateB = b.data.manual_override?.publication_date 
+    const dateB = a.data.manual_override?.publication_date 
       ? new Date(b.data.manual_override.publication_date) 
       : new Date(0);
       
@@ -86,125 +87,328 @@ const sortedPublications = publications
     return dateB.getTime() - dateA.getTime();
   });
 
+// Get media articles
+const mediaArticles = await getCollection("media");
+
+// Sort media: newest first, with featured at the top
+const sortedMediaArticles = mediaArticles
+  .sort((a, b) => {
+    // Featured articles first
+    if (a.data.featured && !b.data.featured) return -1;
+    if (!a.data.featured && b.data.featured) return 1;
+    
+    // Then by publication date (newest first)
+    return new Date(b.data.pubDate).valueOf() - new Date(a.data.pubDate).valueOf();
+  })
+  .slice(0, 5); // Show only the 5 most recent items
+
+// Get videos
+const videos = await getCollection("videos");
+
+// Sort videos: newest first, with featured at the top
+const sortedVideos = videos
+  .sort((a, b) => {
+    // Featured videos first
+    if (a.data.featured && !b.data.featured) return -1;
+    if (!a.data.featured && b.data.featured) return 1;
+    
+    // Then by published date (newest first)
+    return new Date(b.data.publishedAt).valueOf() - new Date(a.data.publishedAt).valueOf();
+  })
+  .slice(0, 4); // Show only the 4 most recent items
+
+// Get collaborators
+const collaborators = await getCollection("collaborators");
+
+// Sort collaborators: featured first, then active before inactive, then alphabetically
+const sortedCollaborators = collaborators
+  .sort((a, b) => {
+    // Featured collaborators first
+    if (a.data.featured && !b.data.featured) return -1;
+    if (!a.data.featured && b.data.featured) return 1;
+    
+    // Active collaborators before inactive ones
+    if (a.data.active && !b.data.active) return -1;
+    if (!a.data.active && b.data.active) return 1;
+    
+    // Then alphabetically by name
+    return a.data.name.localeCompare(b.data.name);
+  })
+  .slice(0, 5); // Show only the 5 most recent items
+
 const socialCount = SOCIALS.filter(social => social.active).length;
 ---
 
-<Layout>
+<Layout fullWidth={true}>
   <Header />
-  <main id="main-content" class="irl-ct-main mx-auto w-full max-w-7xl px-4 pb-12">
-    <section id="hero" class="irl-ct-hero">
-      <div class="hero-content">
-        <h1>Interaction Research Lab</h1>
-        <p class="hero-tagline">
-          Designing interactions with exploratory, frontier methods and extracting insights about interaction using cutting-edge computational methods.
-        </p>
-        <p class="hero-description">
-          The Interaction Research Lab explores the intersection of human behavior, 
-          technology, and design to create more intuitive, accessible, and meaningful interactions at all scales, from face-to-face encounters to city-scale phenomena.
-        </p>
-        <!-- 
-        <div class="hero-buttons">
-          <a href="/projects/" class="secondary-button">
-            View Projects
-          </a>
+  <main id="main-content" class="irl-ct-main w-full pb-12">
+    <!-- Hero section - left-aligned with consistent width -->
+    <div class="content-container-wrapper">
+      <section id="hero" class="irl-ct-hero content-container grid sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-6">
+        <div class="hero-column hero-title-column">
+          <h1>Interaction Research Lab</h1>
         </div>
-        -->
-      </div>
-      <div class="hero-video-container">
-        <iframe 
-          class="hero-video"
-          src="https://www.youtube.com/embed/o52MZ1AHyjA?si=q7sPaSTebT1WbJMS" 
-          title="Interaction Research Lab Research Overview"
-          frameborder="0" 
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-          allowfullscreen>
-        </iframe>
-      </div>
-    </section>
-
-
-    <div class="main-with-sidebar-layout">
-      <div class="main-content">
-        <section id="featured-projects">
-          <h2>Projects</h2>
-          <div class="projects-grid">
-            {
-              allProjects.map(project => (
-                <a href={`/projects/${project.slug}/`} class="project-square">
-                  <div class="project-square-image">
-                    {project.data.image ? (
-                      <img src={project.data.image.src} alt={project.data.title} />
-                    ) : (
-                      <div class="project-image-placeholder"></div>
-                    )}
-                  </div>
-                  <h3 class="project-square-title">{project.data.title}</h3>
-                </a>
-              ))
-            }
-          </div>
-        </section>
-
-        <section id="team-members">
-          <h2>Research Team</h2>
-          <div class="team-grid">
-            {
-              displayTeamMembers.map(member => (
-                <a href={`/team/${member.slug}/`} class="team-card">
-                  {member.data.avatar ? (
-                    <div class="member-avatar">
-                      <img 
-                        src={member.data.avatar.src} 
-                        alt={`Photo of ${member.data.name}`} 
-                      />
-                    </div>
-                  ) : (
-                    <div class="member-avatar">
-                      <div class="avatar-placeholder">
-                        {member.data.name.charAt(0)}
-                      </div>
-                    </div>
-                  )}
-                  <div class="member-info">
-                    <h3>{member.data.name}</h3>
-                    <p>{member.data.role}</p>
-                  </div>
-                </a>
-              ))
-            }
-          </div>
-          <div class="section-link">
-            <LinkButton href="/team/">
-              View Full Team
+        
+        <div class="hero-column hero-tagline-column">
+          <p class="hero-tagline">
+            Designing interactions with exploratory, frontier methods and extracting insights about interaction using cutting-edge computational methods.
+          </p>
+        </div>
+        
+        <div class="hero-column hero-description-column">
+          <p class="hero-description">
+            The Interaction Research Lab explores the intersection of human behavior, 
+            technology, and design to create more intuitive, accessible, and meaningful interactions at all scales, from face-to-face encounters to city-scale phenomena.
+          </p>
+        </div>
+        
+        <div class="hero-column hero-location-column">
+          <p class="hero-description">
+            Located on Roosevelt Island in New York City at Cornell Tech, the graduate campus of Cornell University, our lab benefits from a vibrant ecosystem of technology innovation and interdisciplinary research.
+          </p>
+          <div class="location-link">
+            <LinkButton href="https://tech.cornell.edu/">
+              Visit Cornell Tech
               <svg xmlns="http://www.w3.org/2000/svg">
                 <path d="m11.293 17.293 1.414 1.414L19.414 12l-6.707-6.707-1.414 1.414L15.586 11H6v2h9.586z"></path>
               </svg>
             </LinkButton>
           </div>
-        </section>
+        </div>
+      </section>
+      
+      <!-- Projects header with proper section structure -->
+      <section class="irl-ct-hero content-container">
+        <div class="hero-column team-content-column">
+          <div class="column-header">
+            <h2>Projects</h2>
+          </div>
+        </div>
+      </section>
+    </div>
 
-        {
-          socialCount > 0 && (
-            <div class="social-wrapper">
-              <div class="social-links">Connect with us:</div>
-              <Socials />
-            </div>
-          )
-        }
+    <!-- Projects content (in full-width section) -->
+    <section class="full-width-section">
+      <div class="projects-scroll-container">
+        <div class="projects-scroll-row">
+          {
+            allProjects.map(project => (
+              <a href={`/projects/${project.slug}/`} class="project-scroll-item">
+                <div class="project-square-image">
+                  {project.data.image ? (
+                    <img src={project.data.image.src} alt={project.data.title} />
+                  ) : (
+                    <div class="project-image-placeholder"></div>
+                  )}
+                </div>
+                <h3 class="project-square-title">{project.data.title}</h3>
+                <p class="project-square-year">{new Date(project.data.startDate).getFullYear() + 1}</p>
+              </a>
+            ))
+          }
+        </div>
       </div>
+    </section>
 
-      <div class="sidebar">
-        <aside class="publications-sidebar">
-          <DoiPaperFeed 
-            publications={sortedPublications} 
-            title="Recent Publications" 
-            viewAllUrl="/publications/"
-            maxItems={6}
-          />
-        </aside>
+    <!-- Team section - left-aligned with consistent width -->
+    <div class="content-container-wrapper">
+      <section id="team-section" class="irl-ct-hero content-container grid sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-5 gap-6">
+        <div class="hero-column team-content-column">
+          <div class="column-header">
+            <h2>Research Team</h2>
+          </div>
+          <div class="column-content">
+            <div class="team-grid">
+              {
+                displayTeamMembers.map(member => (
+                  <a href={`/team/${member.slug}/`} class="team-card">
+                    {member.data.avatar ? (
+                      <div class="member-avatar">
+                        <img 
+                          src={member.data.avatar.src} 
+                          alt={`Photo of ${member.data.name}`} 
+                        />
+                      </div>
+                    ) : (
+                      <div class="member-avatar">
+                        <div class="avatar-placeholder">
+                          {member.data.name.charAt(0)}
+                        </div>
+                      </div>
+                    )}
+                    <div class="member-info">
+                      <h3>{member.data.name}</h3>
+                      <p>{member.data.role}</p>
+                    </div>
+                  </a>
+                ))
+              }
+            </div>
+            <div class="section-link">
+              <LinkButton href="/team/">
+                View Full Team
+                <svg xmlns="http://www.w3.org/2000/svg">
+                  <path d="m11.293 17.293 1.414 1.414L19.414 12l-6.707-6.707-1.414 1.414L15.586 11H6v2h9.586z"></path>
+                </svg>
+              </LinkButton>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Publications in second column -->
+        <div class="hero-column publications-column">
+          <div class="column-header">
+            <h2>Recent Publications</h2>
+          </div>
+          <div class="column-content">
+            <DoiPaperFeed 
+              publications={sortedPublications} 
+              viewAllUrl="/publications/"
+              maxItems={3}
+              hideTitle={true} /* Explicitly set to true to ensure the title is hidden */
+            />
+          </div>
+        </div>
+        
+        <!-- Media coverage in third column -->
+        <div class="hero-column media-column">
+          <div class="column-header">
+            <h2>In the News</h2>
+          </div>
+          <div class="column-content">
+            <div class="media-list">
+              {
+                sortedMediaArticles.map(article => (
+                  <a href={article.data.url} target="_blank" rel="noopener noreferrer" class="media-item">
+                    <h3 class="media-title">{article.data.title}</h3>
+                    <div class="media-item-header">
+                      <span class="media-source">{article.data.source}</span>
+                      <span class="media-date">{new Date(article.data.pubDate).toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric'
+                      })}</span>
+                    </div>
+                  </a>
+                ))
+              }
+            </div>
+            <div class="section-link">
+              <LinkButton href="/media/">
+                View All Press
+                <svg xmlns="http://www.w3.org/2000/svg">
+                  <path d="m11.293 17.293 1.414 1.414L19.414 12l-6.707-6.707-1.414 1.414L15.586 11H6v2h9.586z"></path>
+                </svg>
+              </LinkButton>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Videos column -->
+        <div class="hero-column videos-column">
+          <div class="column-header">
+            <h2>Videos</h2>
+          </div>
+          <div class="column-content">
+            <div class="video-list">
+              {
+                sortedVideos.map(video => (
+                  <a href={`https://www.youtube.com/watch?v=${video.data.youtubeId}`} target="_blank" rel="noopener noreferrer" class="video-item">
+                    <div class="video-thumbnail">
+                      <img 
+                        src={video.data.thumbnailUrl || `https://i.ytimg.com/vi/${video.data.youtubeId}/mqdefault.jpg`} 
+                        alt={`Thumbnail for ${video.data.title}`} 
+                      />
+                      <div class="play-button">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M8 5v14l11-7z"/>
+                        </svg>
+                      </div>
+                    </div>
+                    <h3 class="video-title">{video.data.title}</h3>
+                    <div class="video-date">
+                      {new Date(video.data.publishedAt).toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric'
+                      })}
+                    </div>
+                  </a>
+                ))
+              }
+            </div>
+            <div class="section-link">
+              <LinkButton href="/videos/">
+                View All Videos
+                <svg xmlns="http://www.w3.org/2000/svg">
+                  <path d="m11.293 17.293 1.414 1.414L19.414 12l-6.707-6.707-1.414 1.414L15.586 11H6v2h9.586z"></path>
+                </svg>
+              </LinkButton>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Fifth column for collaborators -->
+        <div class="hero-column collaborators-column">
+          <div class="column-header">
+            <h2>Collaborators</h2>
+          </div>
+          <div class="column-content">
+            <div class="collaborators-list">
+              {
+                sortedCollaborators.map(collaborator => (
+                  <a href={collaborator.data.website} target="_blank" rel="noopener noreferrer" class="collaborator-item">
+                    <div 
+                      class="collaborator-logo" 
+                      data-white-logo={collaborator.data.whiteLogo ? "true" : "false"}
+                      style="background: linear-gradient(135deg, #f8f8f8 0%, #e8e8e8 100%);"
+                    >
+                      {collaborator.data.logo ? (
+                        <img 
+                          src={collaborator.data.logo.src} 
+                          alt={`Logo of ${collaborator.data.name}`} 
+                          title={collaborator.data.name}
+                          style="width: 100%; height: auto; object-fit: contain;"
+                        />
+                      ) : (
+                        <div class="logo-placeholder" title={collaborator.data.name}>
+                          {collaborator.data.name.charAt(0)}
+                        </div>
+                      )}
+                    </div>
+                  </a>
+                ))
+              }
+            </div>
+            <div class="section-link">
+              <LinkButton href="/collaborators/">
+                All Collaborators
+                <svg xmlns="http://www.w3.org/2000/svg">
+                  <path d="m11.293 17.293 1.414 1.414L19.414 12l-6.707-6.707-1.414 1.414L15.586 11H6v2h9.586z"></path>
+                </svg>
+              </LinkButton>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div class="main-with-sidebar-layout content-container">
+        <div class="main-content">
+          {
+            socialCount > 0 && (
+              <div class="social-wrapper">
+                <div class="social-links">Connect with us:</div>
+                <Socials />
+              </div>
+            )
+          }
+        </div>
+
+        <div class="sidebar">
+          <!-- Publications have been moved to the team section's second column -->
+        </div>
       </div>
     </div>
   </main>
-
   <Footer />
 </Layout>

@@ -13,7 +13,7 @@ const { activeNav } = Astro.props;
 <header>
   <a id="skip-to-content" href="#main-content">Skip to content</a>
   <div class="nav-container">
-    <div class="top-nav-wrap">
+    <div class="header-content">
       <a href="/" class="logo whitespace-nowrap">
           {
             LOGO_IMAGE.enable ? (
@@ -29,6 +29,7 @@ const { activeNav } = Astro.props;
             )
           }
       </a>
+      
       <nav id="nav-menu">
         <button
           class="hamburger-menu focus-outline"
@@ -148,7 +149,7 @@ const { activeNav } = Astro.props;
       </nav>
     </div>
   </div>
-  <Hr />
+  <hr class="header-divider" />
 </header>
 
 <style>
@@ -156,14 +157,22 @@ const { activeNav } = Astro.props;
     @apply absolute -top-full left-16 z-50 bg-skin-accent px-3 py-2 text-skin-inverted transition-all focus:top-4;
   }
   .nav-container {
-    @apply mx-auto flex max-w-5xl flex-col items-center justify-between sm:flex-row;
+    @apply w-full;
   }
-  .top-nav-wrap {
-    @apply relative flex w-full items-start justify-between p-4 sm:items-center sm:py-8;
+  .header-content {
+    @apply flex items-center justify-between p-4 sm:py-8;
   }
   .logo {
-    @apply absolute py-1 text-xl font-semibold sm:static sm:text-2xl;
+    @apply py-1 text-xl font-semibold sm:text-2xl z-10;
   }
+  
+  .header-divider {
+    @apply w-full border-0 h-px my-0;
+    background-color: rgba(var(--color-border), 0.8);
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+  
   .hamburger-menu {
     @apply self-end p-2 sm:hidden;
   }
@@ -172,7 +181,7 @@ const { activeNav } = Astro.props;
   }
 
   nav {
-    @apply flex w-full flex-col items-center sm:ml-2 sm:flex-row sm:justify-end sm:space-x-4 sm:py-0;
+    @apply flex items-center sm:justify-end sm:space-x-4 sm:py-0 z-10;
   }
   nav ul {
     @apply mt-4 grid w-44 grid-cols-2 grid-rows-4 gap-x-2 gap-y-2 sm:ml-0 sm:mt-0 sm:w-auto sm:gap-x-5 sm:gap-y-0;

@@ -18,14 +18,19 @@ function getPreferTheme() {
 
 let themeValue = getPreferTheme();
 
+// Store the visual theme users actually see - always use "light" for visual styling
+const visualTheme = "light";
+
 function setPreference() {
   localStorage.setItem("theme", themeValue);
   reflectPreference();
 }
 
 function reflectPreference() {
-  document.firstElementChild.setAttribute("data-theme", themeValue);
+  // Apply consistent visual styling regardless of theme selection 
+  document.firstElementChild.setAttribute("data-theme", visualTheme);
 
+  // Keep correct aria label for accessibility
   document.querySelector("#theme-btn")?.setAttribute("aria-label", themeValue);
 
   // Get a reference to the body element
