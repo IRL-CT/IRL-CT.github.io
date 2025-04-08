@@ -13,51 +13,31 @@ const { noMarginTop = false } = Astro.props;
 ---
 
 <footer class={`${noMarginTop ? "" : "mt-auto"}`}>
-  <div class="max-w-5xl mx-auto px-4 py-4 main-footer">
-    <Hr noPadding />
-    <div class="footer-wrapper">
-      <Socials centered />
-      <div class="copyright-wrapper">
-        <span>Copyright &#169; {currentYear} IRL: Interaction Research Lab </span>
-        <span class="separator">&nbsp;|&nbsp;</span>
-        <span>All rights reserved.</span>
-      </div>
-      <div class="logo-wrapper">
-      {
-        LOGO_IMAGE.enable ? (
-          <img
-            src={`/assets/${LOGO_IMAGE.svg ? "logo.svg" : "logo.png"}`}
-            class=""
-            alt={SITE.title}
-            width={LOGO_IMAGE.width}
-            height={LOGO_IMAGE.height}
-          />
-        ) : (
-          SITE.title
-        )
-      }
+  <div class="footer-container">
+    <div class="footer-content">
+      <Hr noPadding />
+      <div class="footer-wrapper">
+        <Socials centered />
+        <div class="copyright-wrapper">
+          <span>Copyright &#169; {currentYear} IRL: Interaction Research Lab </span>
+          <span class="separator">&nbsp;|&nbsp;</span>
+          <span>All rights reserved.</span>
+        </div>
+        <div class="logo-wrapper">
+        {
+          LOGO_IMAGE.enable ? (
+            <img
+              src={`/assets/${LOGO_IMAGE.svg ? "logo.svg" : "logo.png"}`}
+              alt={SITE.title}
+              width={LOGO_IMAGE.width}
+              height={LOGO_IMAGE.height}
+            />
+          ) : (
+            SITE.title
+          )
+        }
+        </div>
       </div>
     </div>
   </div>
 </footer>
-
-<style>
-  footer {
-    @apply w-full;
-  }
-  .footer-wrapper {
-    @apply flex flex-col items-center justify-between py-6 sm:flex-row-reverse sm:py-4;
-  }
-  .link-button {
-    @apply my-1 p-2 hover:rotate-6;
-  }
-  .link-button svg {
-    @apply scale-125;
-  }
-  .copyright-wrapper {
-    @apply my-2 flex flex-col items-center whitespace-nowrap sm:flex-row;
-  }
-  .separator {
-    @apply hidden sm:inline;
-  }
-</style>

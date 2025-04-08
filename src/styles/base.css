@@ -488,4 +488,64 @@
     @apply block;
   }
 
+  /* ===== Footer Styles ===== */
+  /* These are separate from header styles to avoid conflicts */
+  
+  footer {
+    @apply w-full;
+  }
+  
+  footer .footer-container {
+    width: 100%;
+    box-sizing: border-box;
+    position: relative;
+    padding-left: var(--page-margin-small);
+    padding-right: var(--page-margin-small);
+  }
+  
+  @media (min-width: 768px) {
+    footer .footer-container {
+      padding-left: var(--page-margin-medium);
+      padding-right: var(--page-margin-medium);
+    }
+  }
+  
+  @media (min-width: 1024px) {
+    footer .footer-container {
+      padding-left: 5rem;
+      padding-right: 5rem;
+    }
+  }
+  
+  footer .footer-content {
+    @apply flex flex-col p-4 sm:py-8;
+    position: relative;
+  }
+  
+  footer .footer-wrapper {
+    @apply flex flex-col items-center py-4 sm:flex-row-reverse sm:py-4;
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  footer .logo-wrapper {
+    @apply py-1 text-xl font-semibold sm:text-2xl;
+    display: flex;
+    align-items: center;
+  }
+  
+  footer .copyright-wrapper {
+    @apply my-2 flex flex-col items-center whitespace-nowrap sm:flex-row sm:items-center;
+  }
+
+  /* On mobile, adjust spacing between footer elements */
+  @media (max-width: 640px) {
+    footer .footer-wrapper {
+      gap: 1rem;
+    }
+  }
+  
+  footer .separator {
+    @apply hidden sm:inline;
+  }
 }
