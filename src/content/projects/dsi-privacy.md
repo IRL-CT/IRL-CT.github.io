@@ -2,7 +2,7 @@
 title: "Privacy of Groups in Dense Street Imagery"
 featured: true
 startDate: "2024"
-teamMemberIds: ["matt", "hauke", "wendy"]
+teamMemberIds: ["franchi", "hauke", "wendy"]
 summary: "Spatially and temporally dense street imagery (DSI) datasets have grown unbounded. In 2024, individual companies possessed around 3 trillion unique images of public streets. DSI data streams are only set to grow as companies like Lyft and Waymo use DSI to train autonomous vehicle algorithms and analyze collisions. Academic researchers leverage DSI to explore novel approaches to urban analysis. To address privacy vulnerabilities, DSI providers have made good-faith efforts to protect individual privacy by blurring sensitive information such as faces and license plates. In this work, however, we find that increased density and innovation in artificial intelligence fail to protect privacy at a group membership level. We perform a penetration test to demonstrate the ease with which group membership inferences can be made from depictions of obfuscated pedestrians in 25,232,608 dashcam images taken in New York City. By synthesizing empirical findings and existing theoretical frameworks, we develop a typology of groups identifiable within DSI and subsequently analyze the privacy implications of information flows pertaining to each group through the lens of contextual integrity. Finally, we discuss actionable recommendations for researchers working with data from DSI providers."
 image: "assets/projects/dsi-privacy.png"
 ---
