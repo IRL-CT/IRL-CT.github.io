@@ -205,19 +205,11 @@
   margin: 1.5rem 0;
 }
 
-.project-card {
-  display: flex;
-  flex-direction: column;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  background-color: var(--color-card);
-}
 
-.project-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+.project-image {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .project-image img {
@@ -225,7 +217,7 @@
   height: 100%;
   object-fit: contain; /* Changed from 'cover' to 'contain' */
   max-height: 100%;
-  background-color: #f8f8f8; /* Light background for images with transparency */
+  background-color: transparent; /* Change from #f8f8f8 to transparent */
 }
 
 .project-image-placeholder {
@@ -234,133 +226,42 @@
   background-color: #e2e8f0;
 }
 
-.project-card-content {
-  padding: 1.25rem;
-}
-
-.project-status-badge {
-  display: inline-block;
-  padding: 0.25rem 0.75rem;
-  border-radius: 999px;
-  font-size: 0.75rem;
-  font-weight: 500;
-  text-transform: uppercase;
-  margin-bottom: 0.75rem;
-  background-color: #e0f2fe;
-  color: #0369a1;
-}
-
-.project-status-badge[data-status="active"] {
-  background-color: #dcfce7;
-  color: #166534;
-}
-
-.project-status-badge[data-status="completed"] {
-  background-color: #e0f2fe;
-  color: #0369a1;
-}
-
-.project-card h3 {
-  margin-top: 0.5rem;
-  margin-bottom: 0.75rem;
-  font-size: 1.25rem;
-  font-weight: 600;
-}
-
-.project-card p:not(.project-dates) {
-  color: var(--color-text-muted);
-  font-size: 0.95rem;
-  line-height: 1.5;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-height: 4.5em; /* Approximately 3 lines of text */
-}
-
 @media (min-width: 768px) {
-  .project-card {
-    flex-direction: row;
-  }
-  
+
   .project-image {
     flex: 0 0 250px;
     height: auto;
     min-height: 180px;
   }
   
-  .project-card-content {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-  }
 }
 
 /* Team members section */
 .team-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr); /* 3 columns fixed */
-  gap: 0.75rem; /* Reduced gap for all screen sizes */
+  gap: 0.5rem 0; /* Vertical gap only, no horizontal gap */
   margin: 0; /* Keep top margin removed */
 }
 
 @media (max-width: 1024px) {
   .team-grid {
     grid-template-columns: repeat(6, 1fr); /* Keep 3 columns but make them smaller */
-    gap: 0.5rem; /* Even smaller gap on mobile */
-  }
-  
-  .member-avatar {
-    padding-bottom: 70%; /* Reduce height to make tiles more compact */
-    margin-bottom: 0.25rem; /* Reduce bottom margin */
-  }
-  
-  .member-info h3 {
-    font-size: 0.8rem; /* Smaller font size for names */
-    margin: 0 0 0.1rem 0; /* Reduced margin */
-  }
-  
-  .member-info p {
-    font-size: 0.7rem; /* Smaller font size for roles */
-    line-height: 1.1; /* Tighter line height */
-  }
-  
-  .avatar-placeholder {
-    font-size: 1.5rem; /* Smaller font size for placeholder */
-  }
-}
-
-@media (max-width: 480px) {
-  .team-grid {
-    grid-template-columns: repeat(6, 1fr); /* Even more columns for very small screens */
-    gap: 0.35rem; /* Minimum gap */
-  }
-  
-  .member-avatar {
-    padding-bottom: 65%; /* Even smaller height */
-    border-radius: 6px; /* Smaller border radius */
-  }
-  
-  .member-info h3 {
-    font-size: 0.7rem; /* Even smaller font */
-  }
-  
-  .member-info p {
-    font-size: 0.6rem; /* Even smaller role text */
+    gap: 0.5rem 0; /* Vertical gap only */
   }
 }
 
 @media (max-width: 640px) {
   .team-grid {
     grid-template-columns: repeat(4, 1fr); /* Fallback to 2 columns on smaller screens */
+    gap: 0.5rem 0; /* Vertical gap only */
   }
 }
 
 @media (max-width: 480px) {
   .team-grid {
     grid-template-columns: 1fr; /* Single column on very small screens */
+    gap: 0.5rem 0; /* Vertical gap only */
   }
 }
 
@@ -370,9 +271,9 @@
   padding-bottom: 100%; /* Create a square aspect ratio container */
   position: relative;
   overflow: hidden;
-  border-radius: 8px;
-  margin-bottom: 0.75rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 0; /* Remove border radius for tiled look */
+  margin-bottom: 0.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .member-avatar img {
@@ -477,52 +378,83 @@
 .projects-scroll-row {
   display: flex;
   flex-wrap: nowrap;
-  gap: 1.5rem;
-  padding: 0.5rem 0.25rem;
+  gap: 0; /* Remove gap completely */
+  padding: 0.5rem 0;
 }
 
 .project-scroll-item {
   flex: 0 0 auto;
   width: 200px;
-  text-decoration: none;
-  color: inherit;
-  transition: transform 0.2s ease;
-  overflow: hidden;
-  border-color: black;
+  transition: transform 0.2s ease, z-index 0.1s ease;
+  position: relative;
+  /* Remove any box-shadow if it was added via browser default styles */
+  box-shadow: none;
 }
 
 .project-scroll-item:hover {
   transform: translateY(-5px);
+  z-index: 2;
 }
 
 .project-square-image {
   height: 200px;
-  overflow: hidden;
-  border-radius: 8px;
-  background-color: black;
-  border-width: 4px;
+  border-radius: 0;
+  background-color: transparent;
+  border-width: 0;
+  margin-right: 0;
+  display: flex;
+  align-items: flex-start; /* Align to bottom */
+  justify-content: center;
+  box-shadow: none;
 }
 
 .project-square-image img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain; /* Changed from 'cover' to 'contain' to prevent clipping */
+  max-height: 180px; /* This leaves 10px space on top and bottom */
+  width: auto;
+  object-fit: contain;
+  margin-bottom: 10px; /* Add some bottom margin */
 }
 
+/* Add styling for project info container */
+.project-square-info {
+  padding: 0.5rem 0.25rem;
+}
+
+/* Style the project title to match team member names */
 .project-square-title {
-  margin-top: 0.75rem;
-  margin-bottom: 0.25rem;
-  font-size: 1rem;
-  font-weight: 550;
-  text-align: left; /* Changed from center to left */
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin: 0 0 0.25rem 0;
+  line-height: 1.3;
+  color: rgb(var(--color-text-base)) !important; /* Fixed: added rgb() function around the variable */
+  text-decoration: none; /* Remove underline */
 }
 
+/* Style the project year to match team member roles */
 .project-square-year {
-  text-align: left;
-  margin-top: 0.25rem;
-  font-size: 0.85rem;
-  color: rgba(var(--color-text-base), 0.7);
-  font-weight: 400;
+  font-size: 0.8rem;
+  color: var(--color-text-muted, #64748b);
+  margin: 0;
+}
+
+.team-card {
+  position: relative;
+  transition: transform 0.2s ease;
+}
+
+.team-card:hover {
+  transform: translateY(-3px);
+  z-index: 1;
+}
+
+.team-card:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 0;
+  height: 100%;
+  width: 1px;
+  background-color: rgba(var(--color-border), 0.3);
 }
 
 #team-section {
@@ -789,11 +721,12 @@
   padding-bottom: 1rem;
   border-bottom: 1px solid rgba(var(--color-border), 0.8);
   display: block;
-  border-radius: 0; /* Remove border radius for consistency */
+  border-radius: 0; /* Already set to 0, keeping for clarity */
   overflow: hidden;
   transition: all 0.2s ease;
   text-decoration: none;
   color: inherit;
+  box-shadow: none; /* Ensure no shadow on items */
 }
 
 .video-item:last-child {
@@ -806,19 +739,25 @@
   text-decoration: none;
 }
 
+.play-button {
+  display: none; /* Hide the play button completely */
+}
+
 .video-item:hover .play-button {
-  opacity: 1;
-  transform: translate(-50%, -50%) scale(1.1);
+  /* Remove the hover effects for the play button since it's now hidden */
+  opacity: 0;
+  transform: none;
 }
 
 .video-thumbnail {
   position: relative;
   width: 100%;
-  border-radius: 8px;
+  border-radius: 0; /* Remove rounded corners to match other tiles */
   overflow: hidden;
   aspect-ratio: 16 / 9;
   background-color: #000;
   margin-bottom: 0.5rem;
+  box-shadow: none; /* Remove any shadow to match the tile style */
 }
 
 .video-thumbnail img {
@@ -830,29 +769,6 @@
 
 .video-item:hover .video-thumbnail img {
   transform: scale(1.05);
-}
-
-.play-button {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 48px;
-  height: 48px;
-  background-color: rgba(255, 0, 0, 0.8);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  opacity: 0.9;
-  transition: all 0.2s ease;
-}
-
-.play-button svg {
-  width: 24px;
-  height: 24px;
-  margin-left: 2px; /* Slight offset for the triangle icon */
 }
 
 .video-title {

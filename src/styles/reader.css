@@ -1,0 +1,324 @@
+/* Reader Mode Styles */
+html.reader-mode {
+  font-size: 18px !important; /* Increase base font size */
+  --reader-spacing-scale: 1.3; /* Unified spacing scale factor */
+  --reader-image-scale: 1.2; /* Unified image scale factor */
+}
+
+/* Typography scaling */
+html.reader-mode p, 
+html.reader-mode li,
+html.reader-mode .project-square-title,
+html.reader-mode .member-info h3,
+html.reader-mode .video-title,
+html.reader-mode .media-title {
+  font-size: 120% !important;
+  line-height: 1.6 !important;
+  letter-spacing: 0.01em !important; /* Slightly increase letter spacing */
+}
+
+html.reader-mode h1 {
+  font-size: 2.8rem !important;
+  line-height: 1.2 !important;
+  margin-bottom: calc(1rem * var(--reader-spacing-scale)) !important;
+}
+
+html.reader-mode h2 {
+  font-size: 2.2rem !important;
+  line-height: 1.3 !important;
+  margin-bottom: calc(0.8rem * var(--reader-spacing-scale)) !important;
+}
+
+html.reader-mode h3 {
+  font-size: 1.8rem !important;
+  line-height: 1.4 !important;
+}
+
+html.reader-mode .member-info p,
+html.reader-mode .project-square-year,
+html.reader-mode .video-date,
+html.reader-mode .media-date,
+html.reader-mode .media-source {
+  font-size: 110% !important;
+}
+
+/* Add more contrast in reader mode */
+html.reader-mode {
+  --reader-contrast: 1.1;
+}
+
+html.reader-mode[data-theme="light"] {
+  --color-text-base: 0, 0, 0; /* Darker text for better contrast */
+  --color-fill: 252, 252, 252; /* Slightly brighter background for better contrast */
+  --color-border: 200, 200, 200; /* More visible borders */
+}
+
+html.reader-mode[data-theme="dark"] {
+  --color-text-base: 255, 255, 255; /* Brighter text for better contrast */
+  --color-fill: 20, 25, 30; /* Slightly darker background for better contrast */
+  --color-border: 100, 100, 100; /* More visible borders */
+}
+
+/* Style the reader mode button when active */
+html.reader-mode #reader-mode-btn svg {
+  fill: rgb(var(--color-accent)) !important;
+  stroke: rgb(var(--color-accent)) !important;
+}
+
+/* Adjust spacing and layouts for better readability */
+html.reader-mode .content-container,
+html.reader-mode .column-content {
+  max-width: 100%; /* Allow containers to expand for readability */
+}
+
+html.reader-mode p,
+html.reader-mode li {
+  margin-bottom: calc(1.2em * var(--reader-spacing-scale)); /* Add more space between paragraphs */
+}
+
+/* Improve content focus and spacing in reader mode */
+html.reader-mode {
+  scroll-behavior: smooth; /* Smoother scrolling */
+}
+
+/* Add visual cue for reader mode */
+html.reader-mode::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 5px;
+  background-color: rgb(var(--color-accent));
+  z-index: 9999;
+}
+
+/* Enhance images and visual elements */
+html.reader-mode img,
+html.reader-mode .project-square-image img,
+html.reader-mode .member-avatar img,
+html.reader-mode .video-thumbnail img,
+html.reader-mode .collaborator-logo img {
+  transform: scale(var(--reader-image-scale)) !important;
+  transition: transform 0.3s ease !important;
+}
+
+/* Adjust container heights to accommodate larger images */
+html.reader-mode .project-square-image {
+  height: calc(200px * var(--reader-image-scale));
+}
+
+html.reader-mode .project-square-image img {
+  max-height: calc(180px * var(--reader-image-scale));
+}
+
+/* Enhance spacing between elements */
+html.reader-mode .hero-column {
+  padding: calc(0.5rem * var(--reader-spacing-scale));
+}
+
+html.reader-mode .column-content {
+  margin-top: calc(1rem * var(--reader-spacing-scale));
+}
+
+html.reader-mode .project-square-info {
+  padding: calc(0.75rem * var(--reader-spacing-scale)) calc(0.5rem * var(--reader-spacing-scale));
+}
+
+html.reader-mode .team-grid {
+  gap: calc(1rem * var(--reader-spacing-scale)) 0;
+}
+
+html.reader-mode .media-list,
+html.reader-mode .video-list {
+  gap: calc(1.5rem * var(--reader-spacing-scale));
+}
+
+html.reader-mode .media-item,
+html.reader-mode .video-item {
+  padding-bottom: calc(1rem * var(--reader-spacing-scale));
+  margin-bottom: calc(0.5rem * var(--reader-spacing-scale));
+}
+
+/* Enhance visual separation between sections */
+html.reader-mode .irl-ct-hero {
+  gap: calc(2rem * var(--reader-spacing-scale));
+  padding: calc(3rem * var(--reader-spacing-scale)) 0;
+}
+
+html.reader-mode .column-header {
+  margin-bottom: calc(1.5rem * var(--reader-spacing-scale));
+  padding-bottom: calc(0.75rem * var(--reader-spacing-scale));
+}
+
+/* Ensure teams and projects display well */
+html.reader-mode .team-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)) !important;
+}
+
+html.reader-mode .member-avatar {
+  margin-bottom: calc(0.75rem * var(--reader-spacing-scale));
+}
+
+html.reader-mode .collaborators-list {
+  gap: calc(1.5rem * var(--reader-spacing-scale));
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)) !important;
+}
+
+/* Ensure proper scrolling in reader mode */
+html.reader-mode .projects-scroll-container {
+  overflow-x: auto;
+  padding-bottom: calc(1rem * var(--reader-spacing-scale));
+}
+
+html.reader-mode .projects-scroll-row {
+  gap: calc(0.5rem * var(--reader-spacing-scale));
+}
+
+/* Enhance buttons and interactive elements */
+html.reader-mode button,
+html.reader-mode .section-link a {
+  padding: calc(0.75rem * var(--reader-spacing-scale)) calc(1rem * var(--reader-spacing-scale)) !important;
+}
+
+/* Add focus outlines for better accessibility */
+html.reader-mode a:focus,
+html.reader-mode button:focus {
+  outline: 3px solid rgb(var(--color-accent)) !important;
+  outline-offset: 3px !important;
+}
+
+/* Make the main content more readable */
+html.reader-mode .irl-ct-main {
+  padding: 0 calc(1.5rem * var(--reader-spacing-scale));
+}
+
+/* Improve readability on mobile */
+@media (max-width: 768px) {
+  html.reader-mode {
+    --reader-spacing-scale: 1.2; /* Slightly reduce spacing on mobile */
+    --reader-image-scale: 1.15; /* Slightly reduce image scale on mobile */
+  }
+  
+  html.reader-mode .team-grid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)) !important;
+  }
+  
+  html.reader-mode .irl-ct-hero {
+    gap: calc(1.5rem * var(--reader-spacing-scale));
+  }
+}
+
+/* Reader Mode Layout Adjustments - Hide specific columns entirely */
+html.reader-mode .team-content-column,
+html.reader-mode .publications-column {
+  display: none; /* Completely hide these columns */
+}
+
+/* Adjust layout for remaining columns to appear in a single row */
+@media (min-width: 1024px) {
+  html.reader-mode #team-section.irl-ct-hero {
+    grid-template-columns: 1fr 1fr 1fr !important; /* Equal width for remaining 3 columns */
+    grid-template-areas: "news videos collaborators";
+  }
+  
+  /* Ensure the columns appear in the correct order */
+  html.reader-mode .media-column {
+    grid-area: news;
+    order: 1; /* Ensure this is the leftmost column */
+  }
+  
+  html.reader-mode .videos-column {
+    grid-area: videos;
+    order: 2;
+  }
+  
+  html.reader-mode .collaborators-column {
+    grid-area: collaborators;
+    order: 3;
+  }
+}
+
+/* Make sure the remaining columns expand to fill the available space */
+html.reader-mode .media-column,
+html.reader-mode .videos-column,
+html.reader-mode .collaborators-column {
+  width: 100%;
+}
+
+/* Add more breathing room between columns in reader mode */
+@media (min-width: 1024px) {
+  html.reader-mode #team-section.irl-ct-hero {
+    gap: calc(3rem * var(--reader-spacing-scale));
+  }
+}
+
+/* Remove unused code for header links since we're hiding the columns entirely */
+html.reader-mode .team-content-column .column-header::after,
+html.reader-mode .publications-column .column-header::after,
+html.reader-mode .team-content-column .column-header,
+html.reader-mode .publications-column .column-header,
+html.reader-mode .team-content-column .column-content,
+html.reader-mode .publications-column .column-content {
+  content: none;
+  display: none;
+}
+
+/* Make section headers links in reader mode */
+html.reader-mode .media-column .column-header,
+html.reader-mode .videos-column .column-header,
+html.reader-mode .collaborators-column .column-header {
+  cursor: pointer;
+  position: relative;
+}
+
+/* Add visual cue that these are now links */
+html.reader-mode .media-column .column-header::after,
+html.reader-mode .videos-column .column-header::after,
+html.reader-mode .collaborators-column .column-header::after {
+  content: " →";
+  display: inline-block;
+  margin-left: 0.5rem;
+  color: rgb(var(--color-accent));
+}
+
+/* Add padding to remaining content sections since we now have more room */
+html.reader-mode .media-column .column-content,
+html.reader-mode .videos-column .column-content,
+html.reader-mode .collaborators-column .column-content {
+  padding: calc(1rem * var(--reader-spacing-scale));
+  margin-top: 0;
+}
+
+/* Make project tiles wider in reader mode */
+html.reader-mode .project-scroll-item {
+  width: 300px; /* Increased from 200px */
+}
+
+/* Adjust project title size and padding for better readability */
+html.reader-mode .project-square-title {
+  font-size: 1.1rem !important; /* Slightly larger title */
+  margin-bottom: 0.5rem;
+}
+
+/* Improve column layout in reader mode to better use available space */
+@media (min-width: 1024px) {
+  html.reader-mode #team-section.irl-ct-hero {
+    grid-template-columns: 1fr 1fr 1fr !important; /* Equal width for remaining 3 columns */
+  }
+  
+  /* Remove any span rules since we now have 3 equally sized columns */
+  html.reader-mode .media-column,
+  html.reader-mode .videos-column,
+  html.reader-mode .collaborators-column {
+    grid-column: auto; /* Reset any span settings */
+  }
+}
+
+/* Ensure proper spacing for the headers-only columns */
+html.reader-mode .team-content-column,
+html.reader-mode .publications-column {
+  min-height: auto;
+  margin-bottom: calc(2rem * var(--reader-spacing-scale));
+}

@@ -26,3 +26,11 @@ export type SocialObjects = {
   active: boolean;
   linkTitle: string;
 }[];
+
+// Add specific OG image types for better TypeScript support
+export type OgImageOptions = {
+  title?: string;
+  description?: string;
+  imageSrc?: string;
+  tags?: string[];
+};

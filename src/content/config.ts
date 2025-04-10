@@ -52,6 +52,12 @@ const projects = defineCollection({
       fundingSource: z.array(z.string()).optional(),
       externalLink: z.string().url().optional(),
       description: z.string().optional(),
+      ogImage: image()
+        .refine(img => img.width >= 1200 && img.height >= 630, {
+          message: "OpenGraph image must be at least 1200 X 630 pixels!",
+        })
+        .or(z.string())
+        .optional(),
     }),
 });
 
@@ -88,6 +94,12 @@ const team = defineCollection({
         .optional(),
       bio: z.string(),
       research_interests: z.array(z.string()).optional(),
+      ogImage: image()
+        .refine(img => img.width >= 1200 && img.height >= 630, {
+          message: "OpenGraph image must be at least 1200 X 630 pixels!",
+        })
+        .or(z.string())
+        .optional(),
     }),
 });
 

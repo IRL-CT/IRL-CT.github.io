@@ -8,6 +8,10 @@ import Socials from "@components/Socials.astro";
 import DoiPaperFeed from "@components/DoiPaperFeed.astro";
 import { SITE, SOCIALS } from "@config";
 import "../styles/home.css";
+import "../styles/reader.css"; // Import the reader.css file
+
+// Define dynamic OG image URL for home page
+const ogImageUrl = `/api/og/home.png`;
 
 // Get projects
 const projects = await getCollection("projects");
@@ -139,7 +143,7 @@ const sortedCollaborators = collaborators
 const socialCount = SOCIALS.filter(social => social.active).length;
 ---
 
-<Layout fullWidth={true}>
+<Layout fullWidth={true} ogImage={ogImageUrl}>
   <Header />
   <main id="main-content" class="irl-ct-main w-full pb-12">
     <!-- Hero section - left-aligned with consistent width -->
@@ -201,8 +205,10 @@ const socialCount = SOCIALS.filter(social => social.active).length;
                     <div class="project-image-placeholder"></div>
                   )}
                 </div>
-                <h3 class="project-square-title">{project.data.title}</h3>
-                <p class="project-square-year">{new Date(project.data.startDate).getFullYear()}</p>
+                <div class="project-square-info">
+                  <h3 class="project-square-title">{project.data.title}</h3>
+                  <p class="project-square-year">{new Date(project.data.startDate).getFullYear()}</p>
+                </div>
               </a>
             ))
           }
@@ -214,9 +220,9 @@ const socialCount = SOCIALS.filter(social => social.active).length;
     <div class="content-container-wrapper">
       <section id="team-section" class="irl-ct-hero content-container grid sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-5 gap-6">
         <div class="hero-column team-content-column">
-          <div class="column-header">
+          <a href="/team/" class="column-header" id="team-header">
             <h2>Research Team</h2>
-          </div>
+          </a>
           <div class="column-content">
             <div class="team-grid">
               {
@@ -257,9 +263,9 @@ const socialCount = SOCIALS.filter(social => social.active).length;
         
         <!-- Publications in second column -->
         <div class="hero-column publications-column">
-          <div class="column-header">
+          <a href="/publications/" class="column-header" id="publications-header">
             <h2>Recent Publications</h2>
-          </div>
+          </a>
           <div class="column-content">
             <DoiPaperFeed 
               publications={sortedPublications} 
