@@ -2,17 +2,28 @@ import { SITE } from "@config";
 import { getCollection } from "astro:content";
 import satori, { type SatoriOptions } from "satori";
 
-// Use a known working font approach with embedded Noto Sans font
-const fontRegular = Buffer.from(
-  await fetch(
-    "https://raw.githubusercontent.com/googlefonts/noto-fonts/main/hinted/ttf/NotoSans/NotoSans-Regular.ttf"
-  ).then(res => res.arrayBuffer())
+// Use a more reliable font loading approach with Google Fonts
+const fetchFont = async (url: string) => {
+  try {
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch font: ${response.statusText}`);
+    }
+    return Buffer.from(await response.arrayBuffer());
+  } catch (error) {
+    console.error("Error loading font:", error);
+    // Return a minimal fallback font to prevent complete failure
+    return Buffer.from("");
+  }
+};
+
+// Use Google Fonts CDN for more reliable loading
+const fontRegular = await fetchFont(
+  "https://fonts.googleapis.com/css2?family=Inter:wght@400&display=swap"
 );
 
-const fontBold = Buffer.from(
-  await fetch(
-    "https://raw.githubusercontent.com/googlefonts/noto-fonts/main/hinted/ttf/NotoSans/NotoSans-Bold.ttf"
-  ).then(res => res.arrayBuffer())
+const fontBold = await fetchFont(
+  "https://fonts.googleapis.com/css2?family=Inter:wght@700&display=swap"
 );
 
 export default async function siteOgImage(): Promise<string> {
@@ -171,13 +182,13 @@ export default async function siteOgImage(): Promise<string> {
       height: 630,
       fonts: [
         {
-          name: "Noto Sans",
+          name: "Inter",
           data: fontRegular,
           weight: 400,
           style: "normal",
         },
         {
-          name: "Noto Sans",
+          name: "Inter",
           data: fontBold,
           weight: 700,
           style: "normal",
