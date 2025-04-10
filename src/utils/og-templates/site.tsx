@@ -2,19 +2,20 @@ import { SITE } from "@config";
 import { getCollection } from "astro:content";
 import satori, { type SatoriOptions } from "satori";
 
-const fetchFonts = async () => {
-  const fontRegular = await fetch(
-    "https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap"
-  ).then(res => res.arrayBuffer());
-  const fontBold = await fetch(
-    "https://fonts.googleapis.com/css2?family=Inter:wght@700&display=swap"
-  ).then(res => res.arrayBuffer());
-  return { fontRegular, fontBold };
-};
+// Use a known working font approach with embedded Noto Sans font
+const fontRegular = Buffer.from(
+  await fetch(
+    "https://raw.githubusercontent.com/googlefonts/noto-fonts/main/hinted/ttf/NotoSans/NotoSans-Regular.ttf"
+  ).then(res => res.arrayBuffer())
+);
+
+const fontBold = Buffer.from(
+  await fetch(
+    "https://raw.githubusercontent.com/googlefonts/noto-fonts/main/hinted/ttf/NotoSans/NotoSans-Bold.ttf"
+  ).then(res => res.arrayBuffer())
+);
 
 export default async function siteOgImage(): Promise<string> {
-  const { fontRegular, fontBold } = await fetchFonts();
-  
   // Get some recent data to make the image more dynamic
   let featuredProjects = [];
   let teamSize = 0;
@@ -61,7 +62,9 @@ export default async function siteOgImage(): Promise<string> {
           width: "100%",
           height: "100%",
           background: "linear-gradient(to bottom right, #f0f0f0, #ffffff)",
+          letterSpacing: "-.02em",
           border: "12px solid #b31b1b",
+          fontWeight: 700,
           borderRadius: "10px",
         }}
       >
@@ -77,7 +80,7 @@ export default async function siteOgImage(): Promise<string> {
             {SITE.title}
           </p>
           <div style={{ flexGrow: 1 }} />
-          <img 
+          <img
             src="https://brand.cornell.edu/assets/images/logos/cornell-reduced-red.svg" 
             width={120}
             height={40}
@@ -85,12 +88,12 @@ export default async function siteOgImage(): Promise<string> {
           />
         </div>
         
-        <div style={{ 
-          flexGrow: 1, 
+        <div style={{
+          flexGrow: 1,
           display: "flex", 
-          flexDirection: "column", 
+          flexDirection: "column",
           justifyContent: "center",
-          marginTop: 20 
+          marginTop: 20
         }}>
           <p style={{
             fontSize: 64,
@@ -102,17 +105,16 @@ export default async function siteOgImage(): Promise<string> {
           }}>
             Interaction Research Lab
           </p>
-          
+           
           <p style={{
             fontSize: 28,
             color: "#444",
             lineHeight: 1.5,
-            margin: 0
+            margin: 0,
           }}>
             Designing interactions with exploratory, frontier methods and extracting insights
             about interaction using cutting-edge computational methods.
           </p>
-          
           {featuredProjects.length > 0 && (
             <div style={{
               display: "flex",
@@ -129,7 +131,6 @@ export default async function siteOgImage(): Promise<string> {
               </p>
             </div>
           )}
-          
           <div style={{
             display: "flex",
             flexDirection: "row",
@@ -145,7 +146,6 @@ export default async function siteOgImage(): Promise<string> {
                 {teamSize} Researchers
               </p>
             )}
-            
             {publicationsCount > 0 && (
               <p style={{
                 fontSize: 20,
@@ -155,7 +155,6 @@ export default async function siteOgImage(): Promise<string> {
                 {publicationsCount} Publications
               </p>
             )}
-            
             <p style={{
               fontSize: 20,
               color: "#666",
@@ -172,13 +171,13 @@ export default async function siteOgImage(): Promise<string> {
       height: 630,
       fonts: [
         {
-          name: "Inter",
+          name: "Noto Sans",
           data: fontRegular,
           weight: 400,
           style: "normal",
         },
         {
-          name: "Inter",
+          name: "Noto Sans",
           data: fontBold,
           weight: 700,
           style: "normal",

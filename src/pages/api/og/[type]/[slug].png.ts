@@ -1,52 +1,72 @@
+import type { APIRoute } from "astro";
 import { getCollection } from "astro:content";
 import { 
-  generateOgImageForPost, 
   generateOgImageForProject, 
   generateOgImageForTeamMember,
-  generateOgImageForSite 
+  generateOgImageForPost
 } from "@utils/generateOgImages";
 
-export async function GET({ params }) {
-  const { type, slug } = params;
+// This function is required for static builds with dynamic routes
+export async function getStaticPaths() {
+  const projects = await getCollection("projects");
+  const teamMembers = await getCollection("team");
+  const blogPosts = await getCollection("blog");
   
-  let buffer;
+  // Generate paths for all our dynamic content
+  const paths = [
+    // Generate project paths
+    ...projects.map(project => ({
+      params: { type: "project", slug: project.slug },
+      props: { item: project, type: "project" }
+    })),
+    // Generate team member paths
+    ...teamMembers.map(member => ({
+      params: { type: "team", slug: member.slug },
+      props: { item: member, type: "team" }
+    })),
+    // Generate blog post paths
+    ...blogPosts.map(post => ({
+      params: { type: "post", slug: post.slug },
+      props: { item: post, type: "post" }
+    }))
+  ];
   
+  return paths;
+}
+
+export const GET: APIRoute = async function get({ params, props }) {
   try {
-    if (type === 'site') {
-      buffer = await generateOgImageForSite();
-    } 
-    else if (type === 'blog') {
-      const posts = await getCollection('blog');
-      const post = posts.find(post => post.slug === slug);
-      if (!post) throw new Error(`Blog post not found: ${slug}`);
-      buffer = await generateOgImageForPost(post);
-    } 
-    else if (type === 'project') {
-      const projects = await getCollection('projects');
-      const project = projects.find(project => project.slug === slug);
-      if (!project) throw new Error(`Project not found: ${slug}`);
-      buffer = await generateOgImageForProject(project);
-    } 
-    else if (type === 'team') {
-      const members = await getCollection('team');
-      const member = members.find(member => member.slug === slug);
-      if (!member) throw new Error(`Team member not found: ${slug}`);
-      buffer = await generateOgImageForTeamMember(member);
-    } 
-    else {
-      throw new Error(`Unsupported OG image type: ${type}`);
+    const { type, slug } = params;
+    const { item } = props;
+    
+    let pngBuffer;
+    
+    // Generate the appropriate OG image based on content type
+    switch (type) {
+      case "project":
+        pngBuffer = await generateOgImageForProject(item);
+        break;
+      case "team":
+        pngBuffer = await generateOgImageForTeamMember(item);
+        break;
+      case "post":
+        pngBuffer = await generateOgImageForPost(item);
+        break;
+      default:
+        return new Response(`Unsupported content type: ${type}`, { status: 400 });
     }
     
-    return new Response(buffer, {
+    return new Response(pngBuffer, {
+      status: 200,
       headers: {
         "Content-Type": "image/png",
-        "Cache-Control": "public, max-age=31536000, immutable"
-      },
+        "Cache-Control": "public, max-age=86400, s-maxage=86400"
+      }
     });
   } catch (error) {
-    console.error(`Error generating OG image: ${error.message}`);
-    return new Response(`Error generating OG image: ${error.message}`, {
-      status: 500,
+    console.error(`Error generating OG image for ${params.type}/${params.slug}:`, error);
+    return new Response(`Error generating OG image: ${error instanceof Error ? error.message : String(error)}`, {
+      status: 500
     });
   }
 }
