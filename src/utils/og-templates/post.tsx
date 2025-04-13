@@ -1,6 +1,7 @@
 import satori from "satori";
 import type { CollectionEntry } from "astro:content";
 import { SITE } from "@config";
+import { getBasicFont } from "../satoriFont";
 
 export default async (post: CollectionEntry<"blog">) => {
   return satori(
@@ -18,6 +19,7 @@ export default async (post: CollectionEntry<"blog">) => {
     {
       width: 1200,
       height: 630,
+      fonts: await getBasicFont(),
     }
   );
 };

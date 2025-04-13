@@ -1,6 +1,7 @@
 import { SITE } from "@config";
 import { getCollection } from "astro:content";
 import satori, { type SatoriOptions } from "satori";
+import { getBasicFont } from "../satoriFont";
 
 export default async function siteOgImage(): Promise<string> {
   // Get some recent data to make the image more dynamic
@@ -156,6 +157,7 @@ export default async function siteOgImage(): Promise<string> {
     {
       width: 1200,
       height: 630,
+      fonts: await getBasicFont(),
     } as SatoriOptions
   );
 }

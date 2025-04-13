@@ -4,6 +4,7 @@ import { getImage } from "astro:assets";
 import satori, { type SatoriOptions } from "satori";
 import { readFileSync } from "fs";
 import { join } from "path";
+import { getBasicFont } from "../satoriFont";
 
 export default async function projectOgImage(
   project: CollectionEntry<"projects">
@@ -145,6 +146,7 @@ export default async function projectOgImage(
     {
       width: 1200,
       height: 630,
+      fonts: await getBasicFont(),
     } as SatoriOptions
   );
 }

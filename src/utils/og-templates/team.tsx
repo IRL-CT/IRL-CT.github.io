@@ -1,6 +1,7 @@
 import { SITE } from "@config";
 import { CollectionEntry } from "astro:content";
 import satori, { type SatoriOptions } from "satori";
+import { getBasicFont } from "../satoriFont";
 
 export default async function teamMemberOgImage(
   member: CollectionEntry<"team">
@@ -142,6 +143,7 @@ export default async function teamMemberOgImage(
     {
       width: 1200,
       height: 630,
+      fonts: await getBasicFont(),
     } as SatoriOptions
   );
 }
