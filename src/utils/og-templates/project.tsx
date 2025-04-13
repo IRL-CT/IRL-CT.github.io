@@ -145,6 +145,14 @@ export default async function projectOgImage(
     {
       width: 1200,
       height: 630,
+      fonts: [
+        {
+          name: "sans-serif",
+          data: null,
+          weight: 400,
+          style: "normal",
+        },
+      ],
     } as SatoriOptions
   );
 }

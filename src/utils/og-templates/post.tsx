@@ -14,10 +14,48 @@ export default async (post: CollectionEntry<"blog">) => {
         justifyContent: "center",
       }}
     >
+      <div
+        style={{
+          position: "absolute",
+          top: "-1px",
+          right: "-1px",
+          border: "4px solid #000",
+          background: "#ecebeb",
+          opacity: "0.9",
+          borderRadius: "4px",
+          display: "flex",
+          justifyContent: "center",
+          margin: "2.5rem",
+          width: "88%",
+          height: "80%",
+        }}
+      />
+
+      <div
+        style={{
+          border: "4px solid #000",
+          background: "#fefbfb",
+          borderRadius: "4px",
+          display: "flex",
+          justifyContent: "center",
+          margin: "2rem",
+          width: "88%",
+          height: "80%",
+        }}
+      >
+      </div>
     </div>,
     {
       width: 1200,
       height: 630,
+      fonts: [
+        {
+          name: "sans-serif",
+          data: null,
+          weight: 400,
+          style: "normal",
+        },
+      ],
     }
   );
 };
