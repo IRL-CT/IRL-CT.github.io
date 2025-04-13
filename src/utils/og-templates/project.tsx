@@ -5,6 +5,9 @@ import satori, { type SatoriOptions } from "satori";
 import { readFileSync } from "fs";
 import { join } from "path";
 
+// Create a minimal empty buffer for font - null doesn't work
+const MINIMAL_FONT_BUFFER = new Uint8Array([0, 0, 0, 0]).buffer;
+
 export default async function projectOgImage(
   project: CollectionEntry<"projects">
 ): Promise<string> {
@@ -147,9 +150,9 @@ export default async function projectOgImage(
       height: 630,
       fonts: [
         {
-          name: "sans-serif",
-          data: null,
-          weight: 400,
+          name: "system-ui",
+          data: MINIMAL_FONT_BUFFER,
+          weight: 400, 
           style: "normal",
         },
       ],

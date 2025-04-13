@@ -2,6 +2,9 @@ import { SITE } from "@config";
 import { CollectionEntry } from "astro:content";
 import satori, { type SatoriOptions } from "satori";
 
+// Create a minimal empty buffer for font - null doesn't work
+const MINIMAL_FONT_BUFFER = new Uint8Array([0, 0, 0, 0]).buffer;
+
 const fetchFonts = async () => {
   const fontRegular = await fetch(
     "https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap"
@@ -154,8 +157,8 @@ export default async function teamMemberOgImage(
       height: 630,
       fonts: [
         {
-          name: "sans-serif",
-          data: null,
+          name: "system-ui",
+          data: MINIMAL_FONT_BUFFER,
           weight: 400,
           style: "normal",
         },

@@ -2,6 +2,9 @@ import satori from "satori";
 import type { CollectionEntry } from "astro:content";
 import { SITE } from "@config";
 
+// Create a minimal empty buffer for font - null doesn't work
+const MINIMAL_FONT_BUFFER = new Uint8Array([0, 0, 0, 0]).buffer;
+
 export default async (post: CollectionEntry<"blog">) => {
   return satori(
     <div
@@ -50,8 +53,8 @@ export default async (post: CollectionEntry<"blog">) => {
       height: 630,
       fonts: [
         {
-          name: "sans-serif",
-          data: null,
+          name: "system-ui",
+          data: MINIMAL_FONT_BUFFER,
           weight: 400,
           style: "normal",
         },
