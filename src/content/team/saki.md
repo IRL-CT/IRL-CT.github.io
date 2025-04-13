@@ -1,5 +1,5 @@
 --- 
-name: "Natalie Friedman"
+name: "Saki Fukui"
 role: "Alumni"
 joinDate: "2021"
 avatar: "assets/alum/saki.jpg"

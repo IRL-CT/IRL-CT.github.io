@@ -5,21 +5,9 @@ import satori, { type SatoriOptions } from "satori";
 import { readFileSync } from "fs";
 import { join } from "path";
 
-const fetchFonts = async () => {
-  const fontRegular = await fetch(
-    "https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap"
-  ).then(res => res.arrayBuffer());
-  const fontBold = await fetch(
-    "https://fonts.googleapis.com/css2?family=Inter:wght@700&display=swap"
-  ).then(res => res.arrayBuffer());
-  return { fontRegular, fontBold };
-};
-
 export default async function projectOgImage(
   project: CollectionEntry<"projects">
 ): Promise<string> {
-  const { fontRegular, fontBold } = await fetchFonts();
-  
   // Format date range
   const startYear = new Date(project.data.startDate).getFullYear();
   const endDateDisplay = project.data.endDate 
@@ -157,20 +145,6 @@ export default async function projectOgImage(
     {
       width: 1200,
       height: 630,
-      fonts: [
-        {
-          name: "Inter",
-          data: fontRegular,
-          weight: 400,
-          style: "normal",
-        },
-        {
-          name: "Inter",
-          data: fontBold,
-          weight: 700,
-          style: "normal",
-        },
-      ],
     } as SatoriOptions
   );
 }

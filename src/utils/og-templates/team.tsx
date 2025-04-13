@@ -15,8 +15,6 @@ const fetchFonts = async () => {
 export default async function teamMemberOgImage(
   member: CollectionEntry<"team">
 ): Promise<string> {
-  const { fontRegular, fontBold } = await fetchFonts();
-  
   // Handle avatar image
   let avatarSrc = '';
   if (member.data.avatar) {
@@ -154,20 +152,6 @@ export default async function teamMemberOgImage(
     {
       width: 1200,
       height: 630,
-      fonts: [
-        {
-          name: "Inter",
-          data: fontRegular,
-          weight: 400,
-          style: "normal",
-        },
-        {
-          name: "Inter",
-          data: fontBold,
-          weight: 700,
-          style: "normal",
-        },
-      ],
     } as SatoriOptions
   );
 }
