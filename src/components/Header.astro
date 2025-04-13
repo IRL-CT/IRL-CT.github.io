@@ -221,41 +221,81 @@ const { activeNav } = Astro.props;
     const menuBtn = document.querySelector(".hamburger-menu");
     const menuIcon = document.querySelector(".menu-icon");
     const menuItems = document.querySelector("#menu-items");
-    const backdrop = document.createElement("div");
     
-    // Create backdrop element if it doesn't exist
+    // Create a special backdrop that has a clickable area outside the menu
     if (!document.querySelector(".menu-backdrop")) {
+      const backdrop = document.createElement("div");
       backdrop.classList.add("menu-backdrop");
       document.body.appendChild(backdrop);
+      
+      // Add a separate overlay element that will handle the clicks
+      const clickOverlay = document.createElement("div");
+      clickOverlay.classList.add("menu-click-overlay");
+      clickOverlay.style.position = "fixed";
+      clickOverlay.style.inset = "0";
+      clickOverlay.style.zIndex = "39"; // Below menu but above other elements
+      clickOverlay.style.display = "none";
+      document.body.appendChild(clickOverlay);
+      
+      // Add click event to the click overlay
+      clickOverlay.addEventListener("click", (e) => {
+        // Check if click is outside the menu
+        if (menuBtn?.getAttribute("aria-expanded") === "true") {
+          const menu = document.getElementById("menu-items");
+          if (menu && !menu.contains(e.target) && e.target !== menu) {
+            menuBtn.click(); // Close menu if click is outside
+          }
+        }
+      });
+      
+      // Modify the original backdrop management in the toggle function
+      menuBtn?.addEventListener("click", () => {
+        const menuExpanded = menuBtn.getAttribute("aria-expanded") === "true";
+        menuIcon?.classList.toggle("is-active");
+        menuBtn.setAttribute("aria-expanded", menuExpanded ? "false" : "true");
+        menuBtn.setAttribute("aria-label", menuExpanded ? "Open Menu" : "Close Menu");
+        
+        // Toggle menu visibility
+        if (menuItems) {
+          if (menuExpanded) {
+            // Close menu
+            menuItems.classList.add("hidden");
+            menuItems.classList.remove("display-nav");
+            backdrop.classList.remove("is-active");
+            clickOverlay.style.display = "none";
+            setTimeout(() => {
+              backdrop.style.display = "none";
+            }, 200);
+          } else {
+            // Open menu
+            backdrop.style.display = "block";
+            setTimeout(() => {
+              backdrop.classList.add("is-active");
+              menuItems.classList.remove("hidden");
+              menuItems.classList.add("display-nav");
+              clickOverlay.style.display = "block";
+            }, 10);
+          }
+        }
+        
+        // Prevent scrolling when menu is open
+        document.body.style.overflow = menuExpanded ? "" : "hidden";
+      });
     }
-
-    menuBtn?.addEventListener("click", () => {
-      const menuExpanded = menuBtn.getAttribute("aria-expanded") === "true";
-      menuIcon?.classList.toggle("is-active");
-      menuBtn.setAttribute("aria-expanded", menuExpanded ? "false" : "true");
-      menuBtn.setAttribute(
-        "aria-label",
-        menuExpanded ? "Open Menu" : "Close Menu"
-      );
-      
-      // Toggle both display-none and display-nav
-      menuItems?.classList.toggle("display-none");
-      menuItems?.classList.toggle("display-nav");
-      
-      // Toggle backdrop
-      document.querySelector(".menu-backdrop")?.classList.toggle("is-active");
-      
-      // Prevent scrolling when menu is open
-      document.body.style.overflow = menuExpanded ? "" : "hidden";
-    });
     
-    // Close menu when clicking outside
-    backdrop.addEventListener("click", () => {
-      if (menuBtn?.getAttribute("aria-expanded") === "true") {
-        menuBtn.click();
-      }
+    // Fix menu item click handling
+    const menuLinks = menuItems?.querySelectorAll("a, button");
+    menuLinks?.forEach(link => {
+      link.addEventListener("click", (e) => {
+        // Only close menu for navigation links, not utility buttons
+        if (!link.classList.contains("toggle-btn") && 
+            !link.id.includes("theme-btn") && 
+            !link.id.includes("reader-mode-btn") &&
+            menuBtn?.getAttribute("aria-expanded") === "true") {
+          setTimeout(() => menuBtn.click(), 100);
+        }
+      });
     });
-
   }
 
   // Reader Mode functionality

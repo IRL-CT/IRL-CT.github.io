@@ -358,25 +358,34 @@
   
   /* Mobile menu when visible */
   nav ul.display-nav {
-    @apply fixed top-16 left-0 right-0 grid w-full grid-cols-2 grid-rows-4 bg-skin-fill p-6 shadow-lg z-50;
+    @apply fixed top-16 left-0 right-0 grid w-full grid-rows-4 bg-skin-fill p-6 shadow-lg;
     gap: 1rem;
+    grid-template-columns: repeat(3, 1fr);
+    z-index: 41; /* Higher than backdrop */
+    position: relative; /* Create a stacking context */
+    pointer-events: auto !important; /* Ensure menu receives pointer events */
   }
   
   nav ul li {
-    @apply col-span-2 flex items-center justify-center;
+    @apply flex items-center justify-center;
+    grid-column: span 3; /* Make regular items span all 3 columns */
   }
   
   nav ul li a {
     @apply w-full px-4 py-3 text-center font-semibold hover:text-skin-accent sm:my-0 sm:px-2 sm:py-1;
   }
   
-  nav ul li:nth-last-child(2) a {
-    @apply w-auto;
+  /* Special treatment for the utility buttons (search, theme, reader mode) */
+  nav ul li:nth-last-child(3),
+  nav ul li:nth-last-child(2),
+  nav ul li:nth-last-child(1) {
+    @apply col-span-1; /* Each button takes up exactly 1 column */
   }
   
-  nav ul li:nth-last-child(1),
-  nav ul li:nth-last-child(2) {
-    @apply col-span-1;
+  nav ul li:nth-last-child(3) a,
+  nav ul li:nth-last-child(2) a,
+  nav ul li:nth-last-child(1) a {
+    @apply w-auto;
   }
   
   nav .active {
@@ -426,16 +435,64 @@
 
   /* Additional styling to handle menu backdrop */
   .menu-backdrop {
-    @apply hidden fixed inset-0 bg-black bg-opacity-50 z-40;
+    @apply fixed inset-0 bg-black;
+    display: none;
+    pointer-events: none; /* Changed to none so clicks pass through */
+    transition: opacity 0.2s ease-in-out;
+    opacity: 0;
+    z-index: 40; /* Keep below menu */
   }
   
   .menu-backdrop.is-active {
-    @apply block;
+    display: block;
+    opacity: 0.3;
+  }
+
+  /* Make sure menu items are clickable */
+  nav ul.display-nav li, 
+  nav ul.display-nav li a,
+  nav ul.display-nav li button {
+    position: relative;
+    z-index: 42; /* Higher than the menu container */
+    pointer-events: auto !important;
+  }
+
+  /* Additional mobile menu interactivity fixes */
+  @media (max-width: 640px) {
+    /* Menu click overlay for interactions outside the menu */
+    .menu-click-overlay {
+      pointer-events: auto !important;
+      position: fixed;
+      inset: 0;
+      z-index: 39;
+    }
+    
+    /* Ensure the menu appears above the backdrop */
+    nav ul.display-nav {
+      position: fixed !important;
+      z-index: 41 !important;
+      pointer-events: auto !important;
+    }
+    
+    /* Ensure menu items are interactive */
+    nav ul.display-nav li, 
+    nav ul.display-nav li a,
+    nav ul.display-nav li button {
+      position: relative !important;
+      z-index: 42 !important;
+      pointer-events: auto !important;
+    }
+    
+    /* Prevent other page elements from interfering with menu interactions */
+    .irl-ct-hero,
+    .hero-column,
+    .content-container-wrapper {
+      position: static !important;
+      z-index: auto !important;
+    }
   }
 
   /* ===== Footer Styles ===== */
-  /* These are separate from header styles to avoid conflicts */
-  
   footer {
     @apply w-full;
   }
