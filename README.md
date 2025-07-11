@@ -57,7 +57,7 @@ This website includes GitHub Actions automation that automatically generates con
 | File | Generates | Script Used | Content Location |
 |------|-----------|-------------|------------------|
 | `dois.txt` | Publications | `bulkImportPublications.js` | `src/content/publications/` |
-| `press.txt` | Media mentions | `generateMediaMd.js` | `src/content/media/` |
+| `press.txt` | Media mentions | `extractMediaMetadata.js` → `generateMediaFromJson.js` | `src/content/media/` |
 | `videos.txt` | Video content | `generateVideosMd.js` | `src/content/videos/` |
 
 #### 🚀 Quick Usage
@@ -69,10 +69,11 @@ This website includes GitHub Actions automation that automatically generates con
    10.1109/ITSC.2018.8569499
    ```
 
-2. **Add Press Coverage:** Add URLs (one per line) to `press.txt`
+2. **Add Press Coverage:** Add URLs (one per line) to `press.txt` (supports web articles AND YouTube videos)
    ```
    https://www.nytimes.com/2023/07/06/nyregion/nypd-police-deployments.html
    https://www.brooklynpaper.com/trashbots-help-brooklynites-clean-up/
+   https://youtu.be/pTOPOinAy_I
    ```
 
 3. **Add Videos:** Add YouTube URLs (one per line) to `videos.txt`
@@ -91,12 +92,42 @@ You can also run the scripts manually:
 # Generate publications from DOIs
 node src/scripts/bulkImportPublications.js dois.txt
 
-# Generate media from press URLs  
-node src/scripts/generateMediaMd.js
+# Generate media from press URLs (two-step process)
+node src/scripts/extractMediaMetadata.js    # Creates press-metadata.json
+node src/scripts/generateMediaFromJson.js   # Generates markdown from JSON
 
 # Generate videos from YouTube URLs
 node src/scripts/generateVideosMd.js
 ```
+
+#### 📝 Enhanced Media Processing
+
+The media processing uses a **two-step workflow** for better quality control:
+
+1. **Extract Metadata** (`extractMediaMetadata.js`): 
+   - Processes URLs from `press.txt`
+   - Creates `press-metadata.json` with extracted metadata
+   - Supports both **web articles** and **YouTube videos**
+   - Identifies entries that need manual review
+
+2. **Generate Markdown** (`generateMediaFromJson.js`):
+   - Reads from `press-metadata.json` 
+   - Generates final markdown files
+   - Preserves manual edits to the JSON file
+
+**Benefits:**
+- ✅ **Manual editing**: Edit `press-metadata.json` to fix titles, dates, descriptions
+- ✅ **YouTube support**: Extracts video title, channel name, thumbnail
+- ✅ **Duplicate prevention**: Won't reprocess URLs unless forced
+- ✅ **Quality indicators**: Flags entries needing manual review
+- ✅ **Incremental updates**: Only processes new URLs
+
+**Editing Workflow:**
+1. Add URLs to `press.txt` and commit
+2. Automation creates/updates `press-metadata.json`
+3. **Manually edit the JSON file** if needed (fix dates, titles, etc.)
+4. Commit the JSON changes
+5. Automation regenerates markdown files
 
 #### 🔧 Advanced Options
 

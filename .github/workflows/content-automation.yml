@@ -84,8 +84,10 @@ jobs:
       - name: Generate media from press URLs
         if: steps.changes.outputs.press_changed == 'true'
         run: |
-          echo "Running media generation from press.txt..."
-          node src/scripts/generateMediaMd.js
+          echo "Running media extraction from press.txt..."
+          node src/scripts/extractMediaMetadata.js
+          echo "Generating markdown from extracted metadata..."
+          node src/scripts/generateMediaFromJson.js
 
       - name: Generate videos from YouTube URLs
         if: steps.changes.outputs.videos_changed == 'true'
@@ -115,6 +117,9 @@ jobs:
           git add src/content/publications/
           git add src/content/media/
           git add src/content/videos/
+          
+          # Add intermediate metadata files for manual editing
+          git add press-metadata.json
           
           # Create descriptive commit message
           COMMIT_MSG="Auto-generate content from updated files"
