@@ -7,6 +7,7 @@ featured: false
 description: "Sixteen papers from Cornell Tech were honored or featured at the 2025 ACM CHI Conference on Human Factors in Computing Systems."
 tags: ["press"]
 # projectIds: []
+author: "Grace Stanley"
 ---
 
 <!-- You can add additional content about this media mention here if needed -->

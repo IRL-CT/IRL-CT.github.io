@@ -1,7 +1,7 @@
 ---
 title: "ReRun: Enabling Multi-Perspective Analysis of Driving Interaction in VR"
 youtubeId: "YbZVskGdCv0"
-publishedAt: 2025-07-11T19:28:03.233Z
+publishedAt: 2025-07-11T19:41:02.652Z
 description: "Video by David Goedicke"
 thumbnailUrl: "https://i.ytimg.com/vi/YbZVskGdCv0/hqdefault.jpg"
 featured: false

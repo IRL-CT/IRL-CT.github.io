@@ -7,6 +7,7 @@ featured: false
 description: "Cornell Tech researchers used nearly 25 million rideshare dashcam images to identify police cars on city streets and areas that receive more attention than others."
 tags: ["press"]
 # projectIds: []
+author: "Neil Mehta"
 ---
 
 <!-- You can add additional content about this media mention here if needed -->

@@ -7,6 +7,7 @@ featured: false
 description: "Portobello, a new driving simulator developed by researchers at Cornell Tech, blends virtual and mixed realities, enabling both drivers and passengers to see virtual objects overlaid in the real world."
 tags: ["press"]
 # projectIds: []
+author: "Sarah Marquart"
 ---
 
 <!-- You can add additional content about this media mention here if needed -->

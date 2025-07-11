@@ -7,6 +7,7 @@ featured: false
 description: "The rating system is the first of its kind and may help urban planners and robotics companies plan for future robot deployments that won’t disrupt existing sidewalk environments."
 tags: ["press"]
 # projectIds: []
+author: "Patricia Waldron"
 ---
 
 <!-- You can add additional content about this media mention here if needed -->

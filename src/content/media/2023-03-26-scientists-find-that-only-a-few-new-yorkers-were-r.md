@@ -7,6 +7,7 @@ featured: false
 description: "New Yorkers aren’t exactly known for being nice, which was why it was so shocking that only a few were rude to some trash robots in Greenwich Village."
 tags: ["press"]
 # projectIds: []
+author: "Noor Al-Sibai"
 ---
 
 <!-- You can add additional content about this media mention here if needed -->

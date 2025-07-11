@@ -1,0 +1,176 @@
+{
+  "lastUpdated": "2025-07-11T19:40:50.164Z",
+  "stats": {
+    "total": 10,
+    "processed": 10,
+    "errors": 0,
+    "needsReview": 2
+  },
+  "entries": {
+    "https://gothamist.com/news/nypd-does-not-report-where-it-deploys-police-scientists-used-ai-dashcams-to-find-out": {
+      "title": "The NYPD doesn’t report where it deploys police. So scientists used AI, dashcams to find out.",
+      "source": "Gothamist",
+      "pubDate": "2023-07-12T15:00:56.658Z",
+      "url": "https://gothamist.com/news/nypd-does-not-report-where-it-deploys-police-scientists-used-ai-dashcams-to-find-out",
+      "description": "Cornell Tech researchers used nearly 25 million rideshare dashcam images to identify police cars on city streets and areas that receive more attention than others.",
+      "tags": [
+        "press"
+      ],
+      "type": "article",
+      "author": "Neil Mehta",
+      "needsManualReview": false,
+      "notes": [],
+      "filename": "2023-07-12-the-nypd-doesnt-report-where-it-deploys-police-so-.md",
+      "processed": "2025-07-11T19:40:50.563Z"
+    },
+    "https://news.cornell.edu/stories/2023/07/dashcam-images-reveal-where-police-are-deployed": {
+      "title": "Dashcam images reveal where police are deployed | Cornell Chronicle",
+      "source": "Cornell Chronicle",
+      "pubDate": "2023-07-06T12:00:00.000Z",
+      "url": "https://news.cornell.edu/stories/2023/07/dashcam-images-reveal-where-police-are-deployed",
+      "description": "Using a deep learning computer model and dashcam images from New York City rideshare drivers, Cornell Tech researchers were able to see which neighborhoods had the highest numbers of New York Police Department marked vehicles.",
+      "tags": [
+        "press"
+      ],
+      "type": "article",
+      "author": "Tom Fleischman, Cornell Chronicle",
+      "needsManualReview": false,
+      "notes": [],
+      "filename": "2023-07-06-dashcam-images-reveal-where-police-are-deployed-co.md",
+      "processed": "2025-07-11T19:40:51.885Z"
+    },
+    "https://www.economist.com/science-and-technology/2024/03/13/new-york-city-is-covered-in-illegal-scaffolding": {
+      "title": "New York City is covered in illegal scaffolding",
+      "source": "The Economist",
+      "pubDate": "2024-03-13T15:12:47.415Z",
+      "url": "https://www.economist.com/science-and-technology/2024/03/13/new-york-city-is-covered-in-illegal-scaffolding",
+      "description": "Machine learning algorithms could help bring it down",
+      "tags": [
+        "press"
+      ],
+      "type": "article",
+      "author": "The Economist",
+      "needsManualReview": false,
+      "notes": [],
+      "filename": "2024-03-13-new-york-city-is-covered-in-illegal-scaffolding.md",
+      "processed": "2025-07-11T19:40:53.382Z"
+    },
+    "https://www.nytimes.com/2024/07/29/nyregion/street-wars-crowded-sidewalks-times-square.html": {
+      "title": "Article Title (Manual Edit Required)",
+      "source": "nytimes.com",
+      "pubDate": "2025-07-11T19:40:54.511Z",
+      "url": "https://www.nytimes.com/2024/07/29/nyregion/street-wars-crowded-sidewalks-times-square.html",
+      "description": "Description needs manual edit - extraction failed",
+      "tags": [
+        "press"
+      ],
+      "type": "article",
+      "needsManualReview": true,
+      "notes": [
+        "Extraction failed: Response code 403 (Forbidden)",
+        "All fields need manual verification"
+      ],
+      "filename": "2025-07-11-article-title-manual-edit-required.md",
+      "processed": "2025-07-11T19:40:54.511Z"
+    },
+    "https://news.cornell.edu/stories/2023/08/trashbots-help-brooklynites-clean-connect": {
+      "title": "‘Trashbots’ help Brooklynites clean up, connect | Cornell Chronicle",
+      "source": "Cornell Chronicle",
+      "pubDate": "2023-08-17T12:00:00.000Z",
+      "url": "https://news.cornell.edu/stories/2023/08/trashbots-help-brooklynites-clean-connect",
+      "description": "Cornell Tech researchers deployed “trashbots” in Brooklyn for two weeks in July. The goal of the experiment was to see how people interact with, and make sense of, service robots in public spaces. The cleaning was an added bonus.",
+      "tags": [
+        "press"
+      ],
+      "type": "article",
+      "author": "Tom Fleischman, Cornell Chronicle",
+      "needsManualReview": false,
+      "notes": [],
+      "filename": "2023-08-17-trashbots-help-brooklynites-clean-up-connect-corne.md",
+      "processed": "2025-07-11T19:40:55.596Z"
+    },
+    "https://techxplore.com/news/2024-06-virtual-realities-converge-simulator.html": {
+      "title": "Virtual and mixed realities converge in new driving simulator",
+      "source": "Tech Xplore",
+      "pubDate": "2024-06-20T20:21:05.000Z",
+      "url": "https://techxplore.com/news/2024-06-virtual-realities-converge-simulator.html",
+      "description": "Portobello, a new driving simulator developed by researchers at Cornell Tech, blends virtual and mixed realities, enabling both drivers and passengers to see virtual objects overlaid in the real world.",
+      "tags": [
+        "press"
+      ],
+      "type": "article",
+      "author": "Sarah Marquart",
+      "needsManualReview": false,
+      "notes": [],
+      "filename": "2024-06-20-virtual-and-mixed-realities-converge-in-new-drivin.md",
+      "processed": "2025-07-11T19:40:56.929Z"
+    },
+    "https://futurism.com/the-byte/trash-robots-new-york": {
+      "title": "Scientists Find That Only a Few New Yorkers Were Rude to Trash Robots",
+      "source": "Futurism",
+      "pubDate": "2023-03-26T14:10:38.000Z",
+      "url": "https://futurism.com/the-byte/trash-robots-new-york",
+      "description": "New Yorkers aren’t exactly known for being nice, which was why it was so shocking that only a few were rude to some trash robots in Greenwich Village.",
+      "tags": [
+        "press"
+      ],
+      "type": "article",
+      "author": "Noor Al-Sibai",
+      "needsManualReview": false,
+      "notes": [],
+      "filename": "2023-03-26-scientists-find-that-only-a-few-new-yorkers-were-r.md",
+      "processed": "2025-07-11T19:40:58.021Z"
+    },
+    "https://youtu.be/pTOPOinAy_I?si=7gQeAonInBLuDm9C&t=360": {
+      "title": "The Truth About Burning Waymos",
+      "source": "Taylor Lorenz",
+      "pubDate": "2025-07-11T19:40:59.065Z",
+      "url": "https://youtu.be/pTOPOinAy_I?si=7gQeAonInBLuDm9C&t=360",
+      "description": "Video by Taylor Lorenz",
+      "tags": [
+        "press",
+        "video"
+      ],
+      "type": "youtube",
+      "youtubeId": "pTOPOinAy_I",
+      "thumbnailUrl": "https://i.ytimg.com/vi/pTOPOinAy_I/hqdefault.jpg",
+      "channelName": "Taylor Lorenz",
+      "needsManualReview": true,
+      "notes": "YouTube publish date needs manual verification",
+      "filename": "2025-07-11-the-truth-about-burning-waymos.md",
+      "processed": "2025-07-11T19:40:59.065Z"
+    },
+    "https://news.cornell.edu/stories/2025/04/robotability-score-ranks-nyc-streets-future-robot-deployment": {
+      "title": "‘Robotability score’ ranks NYC streets for future robot deployment | Cornell Chronicle",
+      "source": "Cornell Chronicle",
+      "pubDate": "2025-04-30T12:00:00.000Z",
+      "url": "https://news.cornell.edu/stories/2025/04/robotability-score-ranks-nyc-streets-future-robot-deployment",
+      "description": "The rating system is the first of its kind and may help urban planners and robotics companies plan for future robot deployments that won’t disrupt existing sidewalk environments.",
+      "tags": [
+        "press"
+      ],
+      "type": "article",
+      "author": "Patricia Waldron",
+      "needsManualReview": false,
+      "notes": [],
+      "filename": "2025-04-30-robotability-score-ranks-nyc-streets-for-future-ro.md",
+      "processed": "2025-07-11T19:41:00.161Z"
+    },
+    "https://tech.cornell.edu/news/cornell-tech-chi-2025/": {
+      "title": "Cornell Tech Excels at CHI 2025 with 16 Papers and Faculty Honor",
+      "source": "Cornell Tech",
+      "pubDate": "2025-07-11T16:05:25.000Z",
+      "url": "https://tech.cornell.edu/news/cornell-tech-chi-2025/",
+      "description": "Sixteen papers from Cornell Tech were honored or featured at the 2025 ACM CHI Conference on Human Factors in Computing Systems.",
+      "tags": [
+        "press"
+      ],
+      "type": "article",
+      "author": "Grace Stanley",
+      "needsManualReview": false,
+      "notes": [],
+      "filename": "2025-07-11-cornell-tech-excels-at-chi-2025-with-16-papers-and.md",
+      "processed": "2025-07-11T19:41:01.270Z"
+    }
+  }
+}
