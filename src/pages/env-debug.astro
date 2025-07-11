@@ -1,0 +1,45 @@
+---
+const googleAnalyticsId = import.meta.env.PUBLIC_GOOGLE_ANALYTICS_ID;
+const nodeEnv = import.meta.env.NODE_ENV;
+const mode = import.meta.env.MODE;
+---
+
+<html>
+<head>
+    <title>Environment Debug</title>
+</head>
+<body>
+    <h1>Environment Variables Debug</h1>
+    
+    <h2>Environment Info</h2>
+    <p><strong>NODE_ENV:</strong> {nodeEnv || "undefined"}</p>
+    <p><strong>MODE:</strong> {mode || "undefined"}</p>
+    
+    <h2>Google Analytics</h2>
+    <p><strong>PUBLIC_GOOGLE_ANALYTICS_ID:</strong> {googleAnalyticsId || "❌ NOT SET"}</p>
+    
+    <h2>All PUBLIC_ Environment Variables</h2>
+    <pre>{JSON.stringify(
+        Object.fromEntries(
+            Object.entries(import.meta.env).filter(([key]) => key.startsWith('PUBLIC_'))
+        ), 
+        null, 
+        2
+    )}</pre>
+    
+    <h2>Instructions</h2>
+    {googleAnalyticsId ? (
+        <p style="color: green;">✅ Google Analytics ID is set! Analytics should be working.</p>
+    ) : (
+        <div style="color: red;">
+            <p>❌ Google Analytics ID is not set.</p>
+            <p><strong>To fix this:</strong></p>
+            <ol>
+                <li>Go to your hosting platform's environment variables settings</li>
+                <li>Add: <code>PUBLIC_GOOGLE_ANALYTICS_ID</code> = <code>G-NZ0VM763XV</code></li>
+                <li>Redeploy your site</li>
+            </ol>
+        </div>
+    )}
+</body>
+</html> 
