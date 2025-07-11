@@ -4,7 +4,6 @@ source: "Futurism"
 pubDate: 2023-03-26T14:10:38.000Z
 url: "https://futurism.com/the-byte/trash-robots-new-york"
 featured: false
-image: "https://wordpress-assets.futurism.com/2023/03/trash-robot-new-york.jpg"
 description: "New Yorkers aren’t exactly known for being nice, which was why it was so shocking that only a few were rude to some trash robots in Greenwich Village."
 tags: ["press"]
 # projectIds: []
