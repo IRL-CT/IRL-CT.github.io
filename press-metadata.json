@@ -55,24 +55,6 @@
       "filename": "2024-03-13-new-york-city-is-covered-in-illegal-scaffolding.md",
       "processed": "2025-07-11T19:40:53.382Z"
     },
-    "https://www.nytimes.com/2024/07/29/nyregion/street-wars-crowded-sidewalks-times-square.html": {
-      "title": "Article Title (Manual Edit Required)",
-      "source": "nytimes.com",
-      "pubDate": "2025-07-11T19:40:54.511Z",
-      "url": "https://www.nytimes.com/2024/07/29/nyregion/street-wars-crowded-sidewalks-times-square.html",
-      "description": "Description needs manual edit - extraction failed",
-      "tags": [
-        "press"
-      ],
-      "type": "article",
-      "needsManualReview": true,
-      "notes": [
-        "Extraction failed: Response code 403 (Forbidden)",
-        "All fields need manual verification"
-      ],
-      "filename": "2025-07-11-article-title-manual-edit-required.md",
-      "processed": "2025-07-11T19:40:54.511Z"
-    },
     "https://news.cornell.edu/stories/2023/08/trashbots-help-brooklynites-clean-connect": {
       "title": "‘Trashbots’ help Brooklynites clean up, connect | Cornell Chronicle",
       "source": "Cornell Chronicle",
@@ -124,7 +106,7 @@
     "https://youtu.be/pTOPOinAy_I?si=7gQeAonInBLuDm9C&t=360": {
       "title": "The Truth About Burning Waymos",
       "source": "Taylor Lorenz",
-      "pubDate": "2025-07-11T19:40:59.065Z",
+      "pubDate": "2025-06-13T19:40:59.065Z",
       "url": "https://youtu.be/pTOPOinAy_I?si=7gQeAonInBLuDm9C&t=360",
       "description": "Video by Taylor Lorenz",
       "tags": [
@@ -137,7 +119,7 @@
       "channelName": "Taylor Lorenz",
       "needsManualReview": true,
       "notes": "YouTube publish date needs manual verification",
-      "filename": "2025-07-11-the-truth-about-burning-waymos.md",
+      "filename": "2025-06-13-the-truth-about-burning-waymos.md",
       "processed": "2025-07-11T19:40:59.065Z"
     },
     "https://news.cornell.edu/stories/2025/04/robotability-score-ranks-nyc-streets-future-robot-deployment": {
@@ -159,7 +141,7 @@
     "https://tech.cornell.edu/news/cornell-tech-chi-2025/": {
       "title": "Cornell Tech Excels at CHI 2025 with 16 Papers and Faculty Honor",
       "source": "Cornell Tech",
-      "pubDate": "2025-07-11T16:05:25.000Z",
+      "pubDate": "2025-05-25T16:05:25.000Z",
       "url": "https://tech.cornell.edu/news/cornell-tech-chi-2025/",
       "description": "Sixteen papers from Cornell Tech were honored or featured at the 2025 ACM CHI Conference on Human Factors in Computing Systems.",
       "tags": [
@@ -169,7 +151,7 @@
       "author": "Grace Stanley",
       "needsManualReview": false,
       "notes": [],
-      "filename": "2025-07-11-cornell-tech-excels-at-chi-2025-with-16-papers-and.md",
+      "filename": "2025-05-25-cornell-tech-excels-at-chi-2025-with-16-papers-and.md",
       "processed": "2025-07-11T19:41:01.270Z"
     }
   }
