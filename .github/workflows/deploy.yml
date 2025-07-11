@@ -7,6 +7,11 @@ on:
     branches: [ main ]
   # Allows you to run this workflow manually from the Actions tab on GitHub.
   workflow_dispatch:
+  # Also trigger when content automation workflow completes
+  workflow_run:
+    workflows: ["Content Automation"]
+    types:
+      - completed
 
 # Allow this job to clone the repo and create a page deployment
 permissions:

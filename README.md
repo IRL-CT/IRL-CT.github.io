@@ -7,6 +7,7 @@ This guide will help you add and update content on the IRL: Interaction Research
 ### Table of Contents
 
 - [Environment Setup](#environment-setup)
+- [Automated Content Management](#automated-content-management)
 - [Adding Team Members](#adding-team-members)
 - [Adding Projects](#adding-projects)
 - [Adding Publications](#adding-publications)
@@ -46,6 +47,68 @@ PUBLIC_GOOGLE_SITE_VERIFICATION=your_verification_code_here
 4. Add it to your `.env` file as `PUBLIC_GOOGLE_SITE_VERIFICATION`
 
 **Note:** The `.env` file is already included in `.gitignore` and should never be committed to version control for security reasons.
+
+### Automated Content Management
+
+This website includes GitHub Actions automation that automatically generates content when you update specific files in the repository:
+
+#### 📋 How It Works
+
+| File | Generates | Script Used | Content Location |
+|------|-----------|-------------|------------------|
+| `dois.txt` | Publications | `bulkImportPublications.js` | `src/content/publications/` |
+| `press.txt` | Media mentions | `generateMediaMd.js` | `src/content/media/` |
+| `videos.txt` | Video content | `generateVideosMd.js` | `src/content/videos/` |
+
+#### 🚀 Quick Usage
+
+1. **Add Publications:** Add DOIs (one per line) to `dois.txt`
+   ```
+   10.1145/3173574.3173739
+   https://doi.org/10.1016/j.trf.2023.01.013
+   10.1109/ITSC.2018.8569499
+   ```
+
+2. **Add Press Coverage:** Add URLs (one per line) to `press.txt`
+   ```
+   https://www.nytimes.com/2023/07/06/nyregion/nypd-police-deployments.html
+   https://www.brooklynpaper.com/trashbots-help-brooklynites-clean-up/
+   ```
+
+3. **Add Videos:** Add YouTube URLs (one per line) to `videos.txt`
+   ```
+   https://www.youtube.com/watch?v=dQw4w9WgXcQ
+   https://youtu.be/oHg5SJYRHA0
+   ```
+
+4. **Commit and Push:** The automation runs automatically and generates markdown files
+
+#### ⚙️ Manual Processing
+
+You can also run the scripts manually:
+
+```bash
+# Generate publications from DOIs
+node src/scripts/bulkImportPublications.js dois.txt
+
+# Generate media from press URLs  
+node src/scripts/generateMediaMd.js
+
+# Generate videos from YouTube URLs
+node src/scripts/generateVideosMd.js
+```
+
+#### 🔧 Advanced Options
+
+- **Force Run All Scripts:** Go to Actions → Content Automation → Run workflow → Check "Force run all scripts"
+- **Comments:** Add `#` at the beginning of lines in .txt files to skip them
+- **Multiple Formats:** The scripts handle various URL formats automatically
+
+#### 📊 Monitoring
+
+- Check the **Actions** tab in GitHub to see automation status
+- Each run provides a detailed summary of what was processed
+- Generated content is automatically committed with descriptive messages
 
 ### Adding Team Members
 

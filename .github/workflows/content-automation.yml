@@ -1,0 +1,158 @@
+name: Content Automation
+
+on:
+  # Trigger when content files are pushed to main
+  push:
+    branches: [main]
+    paths:
+      - 'dois.txt'
+      - 'press.txt'
+      - 'videos.txt'
+  
+  # Allow manual triggering
+  workflow_dispatch:
+    inputs:
+      force_all:
+        description: 'Force run all scripts regardless of file changes'
+        required: false
+        default: false
+        type: boolean
+
+# Allow this job to read repo and write back to it
+permissions:
+  contents: write
+
+jobs:
+  update-content:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2  # Need at least 2 commits to detect changes
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: latest
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Detect changed files
+        id: changes
+        run: |
+          # Check if this is a manual dispatch with force_all
+          if [ "${{ github.event.inputs.force_all }}" = "true" ]; then
+            echo "dois_changed=true" >> $GITHUB_OUTPUT
+            echo "press_changed=true" >> $GITHUB_OUTPUT
+            echo "videos_changed=true" >> $GITHUB_OUTPUT
+            echo "Manual dispatch with force_all - running all scripts"
+          else
+            # Detect which files changed in the last commit
+            CHANGED_FILES=$(git diff --name-only HEAD~1 HEAD)
+            echo "Changed files: $CHANGED_FILES"
+            
+            if echo "$CHANGED_FILES" | grep -q "^dois\.txt$"; then
+              echo "dois_changed=true" >> $GITHUB_OUTPUT
+              echo "dois.txt was modified"
+            fi
+            
+            if echo "$CHANGED_FILES" | grep -q "^press\.txt$"; then
+              echo "press_changed=true" >> $GITHUB_OUTPUT
+              echo "press.txt was modified"
+            fi
+            
+            if echo "$CHANGED_FILES" | grep -q "^videos\.txt$"; then
+              echo "videos_changed=true" >> $GITHUB_OUTPUT
+              echo "videos.txt was modified"
+            fi
+          fi
+
+      - name: Generate publications from DOIs
+        if: steps.changes.outputs.dois_changed == 'true'
+        run: |
+          echo "Running publication generation from dois.txt..."
+          node src/scripts/bulkImportPublications.js dois.txt
+
+      - name: Generate media from press URLs
+        if: steps.changes.outputs.press_changed == 'true'
+        run: |
+          echo "Running media generation from press.txt..."
+          node src/scripts/generateMediaMd.js
+
+      - name: Generate videos from YouTube URLs
+        if: steps.changes.outputs.videos_changed == 'true'
+        run: |
+          echo "Running video generation from videos.txt..."
+          node src/scripts/generateVideosMd.js
+
+      - name: Check for generated content
+        id: check_changes
+        run: |
+          if git diff --quiet; then
+            echo "No changes generated"
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+          else
+            echo "Content was generated, committing changes"
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+            git diff --name-status
+          fi
+
+      - name: Commit and push generated content
+        if: steps.check_changes.outputs.has_changes == 'true'
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          
+          # Add all generated content files
+          git add src/content/publications/
+          git add src/content/media/
+          git add src/content/videos/
+          
+          # Create descriptive commit message
+          COMMIT_MSG="Auto-generate content from updated files"
+          
+          if [ "${{ steps.changes.outputs.dois_changed }}" = "true" ]; then
+            COMMIT_MSG="$COMMIT_MSG [publications]"
+          fi
+          if [ "${{ steps.changes.outputs.press_changed }}" = "true" ]; then
+            COMMIT_MSG="$COMMIT_MSG [media]"
+          fi
+          if [ "${{ steps.changes.outputs.videos_changed }}" = "true" ]; then
+            COMMIT_MSG="$COMMIT_MSG [videos]"
+          fi
+          
+          git commit -m "$COMMIT_MSG"
+          git push
+
+      - name: Summary
+        run: |
+          echo "## Content Automation Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if [ "${{ steps.changes.outputs.dois_changed }}" = "true" ]; then
+            echo "✅ **Publications updated** from dois.txt" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          if [ "${{ steps.changes.outputs.press_changed }}" = "true" ]; then
+            echo "✅ **Media updated** from press.txt" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          if [ "${{ steps.changes.outputs.videos_changed }}" = "true" ]; then
+            echo "✅ **Videos updated** from videos.txt" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          if [ "${{ steps.check_changes.outputs.has_changes }}" = "true" ]; then
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "📝 **New content generated and committed to repository**" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "ℹ️ **No new content generated** (files may be unchanged or contain invalid URLs/DOIs)" >> $GITHUB_STEP_SUMMARY
+          fi 
