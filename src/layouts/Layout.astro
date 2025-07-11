@@ -6,6 +6,7 @@ import "../styles/reader.css";
 
 const googleSiteVerification = import.meta.env.PUBLIC_GOOGLE_SITE_VERIFICATION;
 const googleAnalyticsId = import.meta.env.PUBLIC_GOOGLE_ANALYTICS_ID;
+const usePartytownForAnalytics = import.meta.env.PUBLIC_USE_PARTYTOWN_ANALYTICS !== "false";
 
 export interface Props {
   title?: string;
@@ -135,15 +136,27 @@ const structuredData = {
     <!-- Google Analytics -->
     {
       googleAnalyticsId && (
-        <>
-          <script type="text/partytown" src={`https://www.googletagmanager.com/gtag/js?id=${googleAnalyticsId}`}></script>
-          <script type="text/partytown">
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', googleAnalyticsId);
-          </script>
-        </>
+        usePartytownForAnalytics ? (
+          <>
+            <script type="text/partytown" src={`https://www.googletagmanager.com/gtag/js?id=${googleAnalyticsId}`}></script>
+            <script type="text/partytown" define:vars={{ googleAnalyticsId }}>
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', googleAnalyticsId);
+            </script>
+          </>
+        ) : (
+          <>
+            <script async src={`https://www.googletagmanager.com/gtag/js?id=${googleAnalyticsId}`}></script>
+            <script is:inline define:vars={{ googleAnalyticsId }}>
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', googleAnalyticsId);
+            </script>
+          </>
+        )
       )
     }
 
