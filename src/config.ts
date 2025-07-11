@@ -18,6 +18,10 @@ export const SITE: Site = {
     text: "Suggest Changes",
     appendFilePath: true,
   },
+  // Analytics
+  analytics: {
+    googleAnalyticsId: import.meta.env.PUBLIC_GOOGLE_ANALYTICS_ID,
+  },
 };
 
 export const LOCALE = {

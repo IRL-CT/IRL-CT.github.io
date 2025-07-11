@@ -18,6 +18,9 @@ export type Site = {
     text?: string;
     appendFilePath?: boolean;
   };
+  analytics?: {
+    googleAnalyticsId?: string;
+  };
 };
 
 export type SocialObjects = {

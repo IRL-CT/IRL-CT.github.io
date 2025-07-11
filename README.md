@@ -6,10 +6,46 @@ This guide will help you add and update content on the IRL: Interaction Research
 
 ### Table of Contents
 
+- [Environment Setup](#environment-setup)
 - [Adding Team Members](#adding-team-members)
 - [Adding Projects](#adding-projects)
 - [Adding Publications](#adding-publications)
 - [Adding and Optimizing Images](#adding-and-optimizing-images)
+
+### Environment Setup
+
+Before working with the website, you'll need to configure environment variables for analytics and other services.
+
+#### Required Environment Variables
+
+Create a `.env` file in the project root with the following variables:
+
+```bash
+# Google Analytics Configuration
+# Get your tracking ID from https://analytics.google.com/
+# Format: G-XXXXXXXXXX (GA4) 
+PUBLIC_GOOGLE_ANALYTICS_ID=G-XXXXXXXXXX
+
+# Google Site Verification (for Google Search Console)
+# Get your verification code from https://search.google.com/search-console
+PUBLIC_GOOGLE_SITE_VERIFICATION=your_verification_code_here
+```
+
+#### Setting Up Google Analytics
+
+1. Go to [Google Analytics](https://analytics.google.com/)
+2. Create a new GA4 property for your website
+3. Get your tracking ID (format: `G-XXXXXXXXXX`)
+4. Add it to your `.env` file as `PUBLIC_GOOGLE_ANALYTICS_ID`
+
+#### Setting Up Google Search Console
+
+1. Go to [Google Search Console](https://search.google.com/search-console)
+2. Add your website as a property
+3. Get your verification meta tag content
+4. Add it to your `.env` file as `PUBLIC_GOOGLE_SITE_VERIFICATION`
+
+**Note:** The `.env` file is already included in `.gitignore` and should never be committed to version control for security reasons.
 
 ### Adding Team Members
 

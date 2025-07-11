@@ -5,6 +5,7 @@ import { ViewTransitions } from "astro:transitions";
 import "../styles/reader.css";
 
 const googleSiteVerification = import.meta.env.PUBLIC_GOOGLE_SITE_VERIFICATION;
+const googleAnalyticsId = import.meta.env.PUBLIC_GOOGLE_ANALYTICS_ID;
 
 export interface Props {
   title?: string;
@@ -128,6 +129,21 @@ const structuredData = {
           name="google-site-verification"
           content={googleSiteVerification}
         />
+      )
+    }
+
+    <!-- Google Analytics -->
+    {
+      googleAnalyticsId && (
+        <>
+          <script type="text/partytown" src={`https://www.googletagmanager.com/gtag/js?id=${googleAnalyticsId}`}></script>
+          <script type="text/partytown">
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', googleAnalyticsId);
+          </script>
+        </>
       )
     }
 
