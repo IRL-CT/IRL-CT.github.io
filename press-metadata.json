@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2025-07-11T19:40:50.164Z",
+  "lastUpdated": "2025-07-11T19:52:51.199Z",
   "stats": {
     "total": 10,
     "processed": 10,
@@ -54,6 +54,24 @@
       "notes": [],
       "filename": "2024-03-13-new-york-city-is-covered-in-illegal-scaffolding.md",
       "processed": "2025-07-11T19:40:53.382Z"
+    },
+    "https://www.nytimes.com/2024/07/29/nyregion/street-wars-crowded-sidewalks-times-square.html": {
+      "title": "Article Title (Manual Edit Required)",
+      "source": "nytimes.com",
+      "pubDate": "2025-07-11T19:52:51.310Z",
+      "url": "https://www.nytimes.com/2024/07/29/nyregion/street-wars-crowded-sidewalks-times-square.html",
+      "description": "Description needs manual edit - extraction failed",
+      "tags": [
+        "press"
+      ],
+      "type": "article",
+      "needsManualReview": true,
+      "notes": [
+        "Extraction failed: Response code 403 (Forbidden)",
+        "All fields need manual verification"
+      ],
+      "filename": "2025-07-11-article-title-manual-edit-required.md",
+      "processed": "2025-07-11T19:52:51.310Z"
     },
     "https://news.cornell.edu/stories/2023/08/trashbots-help-brooklynites-clean-connect": {
       "title": "‘Trashbots’ help Brooklynites clean up, connect | Cornell Chronicle",
