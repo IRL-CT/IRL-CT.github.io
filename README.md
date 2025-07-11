@@ -57,7 +57,7 @@ This website includes GitHub Actions automation that automatically generates con
 | File | Generates | Script Used | Content Location |
 |------|-----------|-------------|------------------|
 | `dois.txt` | Publications | `bulkImportPublications.js` | `src/content/publications/` |
-| `press.txt` | Media mentions | `extractMediaMetadata.js` → `generateMediaFromJson.js` | `src/content/media/` |
+| `press.txt` | Media mentions | `generateMediaMd.js` | `src/content/media/` |
 | `videos.txt` | Video content | `generateVideosMd.js` | `src/content/videos/` |
 
 #### 🚀 Quick Usage
@@ -92,9 +92,8 @@ You can also run the scripts manually:
 # Generate publications from DOIs
 node src/scripts/bulkImportPublications.js dois.txt
 
-# Generate media from press URLs (two-step process)
-node src/scripts/extractMediaMetadata.js    # Creates press-metadata.json
-node src/scripts/generateMediaFromJson.js   # Generates markdown from JSON
+# Generate media from press URLs  
+node src/scripts/generateMediaMd.js
 
 # Generate videos from YouTube URLs
 node src/scripts/generateVideosMd.js
@@ -102,32 +101,24 @@ node src/scripts/generateVideosMd.js
 
 #### 📝 Enhanced Media Processing
 
-The media processing uses a **two-step workflow** for better quality control:
+The media processing includes enhanced features:
 
-1. **Extract Metadata** (`extractMediaMetadata.js`): 
-   - Processes URLs from `press.txt`
-   - Creates `press-metadata.json` with extracted metadata
-   - Supports both **web articles** and **YouTube videos**
-   - Identifies entries that need manual review
+**✨ Features:**
+- ✅ **YouTube support**: Handles YouTube videos alongside web articles
+- ✅ **Duplicate prevention**: Won't recreate existing files
+- ✅ **Smart extraction**: Gets title, description, publish date, author
+- ✅ **Direct editing**: Edit the generated markdown files directly
 
-2. **Generate Markdown** (`generateMediaFromJson.js`):
-   - Reads from `press-metadata.json` 
-   - Generates final markdown files
-   - Preserves manual edits to the JSON file
+**🎯 YouTube Support:**
+- Extracts video title, channel name, and thumbnail
+- Adds `youtubeId`, `channelName`, and `thumbnailUrl` fields
+- Includes note about manual date verification (YouTube oEmbed doesn't provide publish dates)
 
-**Benefits:**
-- ✅ **Manual editing**: Edit `press-metadata.json` to fix titles, dates, descriptions
-- ✅ **YouTube support**: Extracts video title, channel name, thumbnail
-- ✅ **Duplicate prevention**: Won't reprocess URLs unless forced
-- ✅ **Quality indicators**: Flags entries needing manual review
-- ✅ **Incremental updates**: Only processes new URLs
-
-**Editing Workflow:**
-1. Add URLs to `press.txt` and commit
-2. Automation creates/updates `press-metadata.json`
-3. **Manually edit the JSON file** if needed (fix dates, titles, etc.)
-4. Commit the JSON changes
-5. Automation regenerates markdown files
+**✏️ Manual Editing:**
+- Generated markdown files can be edited directly
+- Fix titles, dates, descriptions, or add project associations
+- Changes persist - existing files won't be overwritten
+- Add content below the frontmatter as needed
 
 #### 🔧 Advanced Options
 
