@@ -239,28 +239,28 @@
 /* Team members section */
 .team-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr); /* 3 columns fixed */
+  grid-template-columns: repeat(3, 1fr); /* 3 columns on large screens */
   gap: 0.5rem 0; /* Vertical gap only, no horizontal gap */
   margin: 0; /* Keep top margin removed */
 }
 
 @media (max-width: 1024px) {
   .team-grid {
-    grid-template-columns: repeat(6, 1fr); /* Keep 3 columns but make them smaller */
+    grid-template-columns: repeat(3, 1fr); /* Keep 3 columns on medium screens */
     gap: 0.5rem 0; /* Vertical gap only */
   }
 }
 
 @media (max-width: 640px) {
   .team-grid {
-    grid-template-columns: repeat(4, 1fr); /* Fallback to 2 columns on smaller screens */
+    grid-template-columns: repeat(2, 1fr); /* Always at least 2 columns */
     gap: 0.5rem 0; /* Vertical gap only */
   }
 }
 
 @media (max-width: 480px) {
   .team-grid {
-    grid-template-columns: 1fr; /* Single column on very small screens */
+    grid-template-columns: repeat(2, 1fr); /* Maintain 2 columns even on very small screens */
     gap: 0.5rem 0; /* Vertical gap only */
   }
 }
@@ -789,6 +789,7 @@
   grid-template-columns: repeat(2, 1fr);
   gap: 1.25rem;
   margin-top: -1.5rem !important;
+  max-width: 300px; /* Constrain overall width on small screens */
 }
 
 .collaborator-item {
@@ -803,11 +804,30 @@
   background-color: transparent;
   border-radius: 8px;
   aspect-ratio: 1 / 0.75;
+  max-width: 140px; /* Prevent individual items from getting too large */
+  max-height: 105px; /* Maintain aspect ratio: 140 * 0.75 = 105 */
 }
 
 @media (min-width: 640px) {
   .collaborators-list {
     gap: 1.5rem; /* Slightly larger gap on bigger screens */
+    max-width: 350px; /* Allow slightly larger on medium screens */
+  }
+  
+  .collaborator-item {
+    max-width: 160px; /* Allow larger items on medium screens */
+    max-height: 120px; /* Maintain aspect ratio: 160 * 0.75 = 120 */
+  }
+}
+
+@media (min-width: 1024px) {
+  .collaborators-list {
+    max-width: 400px; /* Allow larger on desktop screens */
+  }
+  
+  .collaborator-item {
+    max-width: 180px; /* Allow larger items on desktop */
+    max-height: 135px; /* Maintain aspect ratio: 180 * 0.75 = 135 */
   }
 }
 
