@@ -49,6 +49,7 @@ const projects = defineCollection({
       teamMemberIds: z.array(z.string()), // References team member IDs (filenames)
       publicationIds: z.array(z.string()).optional(), // References publication IDs (filenames)
       image: image().optional(),
+      video: z.string().optional(),
       fundingSource: z.array(z.string()).optional(),
       externalLink: z.string().url().optional(),
       description: z.string().optional(),

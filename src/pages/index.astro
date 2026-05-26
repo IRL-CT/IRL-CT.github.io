@@ -1,5 +1,6 @@
 ---
 import { getCollection } from "astro:content";
+import { Image } from "astro:assets";
 import Layout from "@layouts/Layout.astro";
 import Header from "@components/Header.astro";
 import Footer from "@components/Footer.astro";
@@ -200,7 +201,13 @@ const socialCount = SOCIALS.filter(social => social.active).length;
               <a href={`/projects/${project.slug}/`} class="project-scroll-item">
                 <div class="project-square-image">
                   {project.data.image ? (
-                    <img src={project.data.image.src} alt={project.data.title} />
+                    <Image
+                      src={project.data.image}
+                      alt={project.data.title}
+                      widths={[300, 600]}
+                      sizes="300px"
+                      loading="lazy"
+                    />
                   ) : (
                     <div class="project-image-placeholder"></div>
                   )}
@@ -230,9 +237,12 @@ const socialCount = SOCIALS.filter(social => social.active).length;
                   <a href={`/team/${member.slug}/`} class="team-card">
                     {member.data.avatar ? (
                       <div class="member-avatar">
-                        <img 
-                          src={member.data.avatar.src} 
-                          alt={`Photo of ${member.data.name}`} 
+                        <Image
+                          src={member.data.avatar}
+                          alt={`Photo of ${member.data.name}`}
+                          widths={[160, 320]}
+                          sizes="80px"
+                          loading="lazy"
                         />
                       </div>
                     ) : (
@@ -314,9 +324,11 @@ const socialCount = SOCIALS.filter(social => social.active).length;
                 sortedVideos.map(video => (
                   <a href={`https://www.youtube.com/watch?v=${video.data.youtubeId}`} target="_blank" rel="noopener noreferrer" class="video-item">
                     <div class="video-thumbnail">
-                      <img 
-                        src={video.data.thumbnailUrl || `https://i.ytimg.com/vi/${video.data.youtubeId}/mqdefault.jpg`} 
-                        alt={`Thumbnail for ${video.data.title}`} 
+                      <img
+                        src={video.data.thumbnailUrl || `https://i.ytimg.com/vi/${video.data.youtubeId}/mqdefault.jpg`}
+                        alt={`Thumbnail for ${video.data.title}`}
+                        loading="lazy"
+                        decoding="async"
                       />
                       <div class="play-button">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
@@ -355,11 +367,14 @@ const socialCount = SOCIALS.filter(social => social.active).length;
                       style="background: linear-gradient(135deg, #f8f8f8 0%, #e8e8e8 100%);"
                     >
                       {collaborator.data.logo ? (
-                        <img 
-                          src={collaborator.data.logo.src} 
-                          alt={`Logo of ${collaborator.data.name}`} 
+                        <Image
+                          src={collaborator.data.logo}
+                          alt={`Logo of ${collaborator.data.name}`}
                           title={collaborator.data.name}
+                          widths={[160, 320]}
+                          sizes="160px"
                           style="width: 100%; height: auto; object-fit: contain;"
+                          loading="lazy"
                         />
                       ) : (
                         <div class="logo-placeholder" title={collaborator.data.name}>

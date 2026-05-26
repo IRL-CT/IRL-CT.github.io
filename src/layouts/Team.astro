@@ -6,6 +6,7 @@ import Pagination from "@components/Pagination.astro";
 import { SITE } from "@config";
 import type { CollectionEntry } from "astro:content";
 import type { Page } from "astro";
+import { Image } from "astro:assets";
 
 export interface Props {
   teamMembers: CollectionEntry<"team">[] | Page<CollectionEntry<"team">>;
@@ -93,9 +94,11 @@ Object.keys(groupedMembers).forEach(role => {
               <a href={`/team/${member.slug}/`} class="member-card">
                 <div class="member-avatar">
                   {member.data.avatar ? (
-                    <img 
-                      src={member.data.avatar.src} 
-                      alt={`Photo of ${member.data.name}`} 
+                    <Image
+                      src={member.data.avatar}
+                      alt={`Photo of ${member.data.name}`}
+                      widths={[240, 480]}
+                      sizes="(min-width: 768px) 240px, 50vw"
                       loading="lazy"
                     />
                   ) : (

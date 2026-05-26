@@ -11,6 +11,7 @@ import { SITE } from "@config";
 import "@styles/projects.css";
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import { Image } from "astro:assets";
 
 export interface Props {
   project: CollectionEntry<"projects">;
@@ -27,6 +28,7 @@ const {
   endDate,
   tags,
   image,
+  video,
   teamMemberIds,
   publicationIds,
   fundingSource,
@@ -214,7 +216,25 @@ const layoutProps = {
       
       {isValid(image) && (
         <div class="project-image">
-          <img src={image.src} alt={`${title || "Project"} image`} />
+          {video ? (
+            <video
+              src={video}
+              poster={image.src}
+              autoplay
+              muted
+              loop
+              playsinline
+              preload="metadata"
+              aria-label={`${title || "Project"} animation`}
+            />
+          ) : (
+            <Image
+              src={image}
+              alt={`${title || "Project"} image`}
+              widths={[800, 1200, 1600]}
+              sizes="(min-width: 1024px) 800px, 100vw"
+            />
+          )}
         </div>
       )}
     </div>
@@ -340,7 +360,13 @@ const layoutProps = {
                   <a href={`/team/${member.slug}/`} class="team-link">
                     {member.data.avatar ? (
                       <div class="member-avatar">
-                        <img src={member.data.avatar.src} alt={member.data.name} />
+                        <Image
+                          src={member.data.avatar}
+                          alt={member.data.name}
+                          widths={[120, 240]}
+                          sizes="60px"
+                          loading="lazy"
+                        />
                       </div>
                     ) : (
                       <div class="member-avatar placeholder-avatar">

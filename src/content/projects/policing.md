@@ -5,5 +5,6 @@ featured: true
 startDate: "2022"
 teamMemberIds: ["franchi", "wendy"]
 publicationIds: ["policing"]
-image: "assets/projects/policing.gif"
+image: "assets/projects/policing-poster.png"
+video: "/assets/projects/policing.mp4"
 ---
