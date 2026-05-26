@@ -221,7 +221,8 @@
     width: 80%; /* Reduced from 100% to make it slightly shorter */
     border: none;
     height: 1px;
-    background-color: black;
+    /* Theme-aware: dark gray in light mode, near-white in dark mode. */
+    background-color: rgb(var(--color-text-base));
     margin: 0 auto; /* Center the divider */
   }
 
@@ -548,6 +549,12 @@
     @apply py-1 text-xl font-semibold sm:text-2xl;
     display: flex;
     align-items: center;
+  }
+
+  /* Logo PNG is pure black on transparent — invert flips it to white in
+     dark mode so it stays visible against the dark fill. */
+  html[data-theme="dark"] footer .logo-wrapper img {
+    filter: invert(1);
   }
   
   footer .copyright-wrapper {

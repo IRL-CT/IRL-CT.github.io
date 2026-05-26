@@ -647,6 +647,15 @@ a.column-header:hover h2 {
   margin-top: 2rem;
 }
 
+/* Homepage CTA links — bold the three "go-somewhere" buttons:
+   View Full Team (.section-link in Team column)
+   All Publications (.section-link in DoiPaperFeed)
+   Visit Cornell Tech (.location-link in hero) */
+.section-link a,
+.location-link a {
+  font-weight: 700;
+}
+
 .social-wrapper {
   display: flex;
   align-items: center;
