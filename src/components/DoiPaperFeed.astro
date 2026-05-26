@@ -106,10 +106,23 @@ const totalPages = Math.ceil(totalItems / itemsPerPage);
           >
             <h3 class="publication-title">
               {pub.data.manual_override?.citation || `Publication ${pub.data.doi}`}
+              <a
+                href={`https://doi.org/${pub.data.doi}`}
+                class="publication-link"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={`Open paper: ${pub.data.manual_override?.citation || pub.data.doi}`}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                  <polyline points="15 3 21 3 21 9"></polyline>
+                  <line x1="10" y1="14" x2="21" y2="3"></line>
+                </svg>
+              </a>
             </h3>
             {pub.data.manual_override?.authors && (
               <p class="publication-authors">
-                {Array.isArray(pub.data.manual_override.authors) 
+                {Array.isArray(pub.data.manual_override.authors)
                   ? pub.data.manual_override.authors.join(", ")
                   : pub.data.manual_override.authors}
               </p>
@@ -118,23 +131,10 @@ const totalPages = Math.ceil(totalItems / itemsPerPage);
               <p class="publication-venue">{pub.data.manual_override.journal}</p>
             )}
             <p class="publication-date">
-              {pub.data.manual_override?.publication_date 
+              {pub.data.manual_override?.publication_date
                 ? formatDate(pub.data.manual_override.publication_date)
                 : getPublicationYear(pub)}
             </p>
-            <a 
-              href={`https://doi.org/${pub.data.doi}`} 
-              class="publication-link"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              View Paper
-              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
-                <polyline points="15 3 21 3 21 9"></polyline>
-                <line x1="10" y1="14" x2="21" y2="3"></line>
-              </svg>
-            </a>
           </li>
         ))}
       </ul>
@@ -431,18 +431,30 @@ const totalPages = Math.ceil(totalItems / itemsPerPage);
   }
 
   .publication-link {
-    font-size: 0.85rem;
     color: rgb(var(--color-accent));
     text-decoration: none;
     display: inline-flex;
     align-items: center;
-    gap: 0.25rem;
-    margin-top: 0.5rem;
-    font-weight: 500;
+    vertical-align: baseline;
+    margin-left: 0.4em;
+    /* Nudge the icon up so its optical center sits with the cap height of
+       the surrounding title rather than sinking toward the baseline. */
+    transform: translateY(0.05em);
+    transition: opacity 0.15s ease-out;
+    opacity: 0.7;
   }
 
   .publication-link:hover {
-    text-decoration: underline;
+    text-decoration: none;
+    opacity: 1;
+  }
+
+  /* Override the global svg { fill: skin-base } so the icon is a clean
+     outline (transparent interior) instead of a filled dark glyph. */
+  .publication-link svg {
+    fill: none;
+    width: 0.9em;
+    height: 0.9em;
   }
 
   .publication-results-counter {

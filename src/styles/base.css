@@ -19,7 +19,11 @@
   /* Base variables that apply to all themes */
   :root {
     --font-fallback: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji;
-    --font-body: 'Inter', var(--font-fallback);
+    /* parabolica from Adobe Fonts (kit krx4hav). System fonts paint instantly
+       on first load while parabolica is fetched; font-display: swap (set by
+       Typekit) does the handover. */
+    --font-body: 'parabolica-text', var(--font-fallback);
+    --font-display: 'parabolica', 'parabolica-text', var(--font-fallback);
     --font-mono: 'IBM Plex Mono', Consolas, 'Andale Mono WT', 'Andale Mono', 'Lucida Console', 'Lucida Sans Typewriter', 'DejaVu Sans Mono', 'Bitstream Vera Sans Mono', 'Liberation Mono', 'Nimbus Mono L', Monaco, 'Courier New', Courier, monospace;
     
     /* Layout variables - moved from lower in the file to be consistent across themes */
@@ -87,7 +91,10 @@
   }
   
   body {
-    @apply flex min-h-[100svh] flex-col bg-skin-fill font-gt-america-regular text-skin-base selection:bg-skin-accent/70 selection:text-skin-inverted;
+    @apply flex min-h-[100svh] flex-col bg-skin-fill text-skin-base selection:bg-skin-accent/70 selection:text-skin-inverted;
+    /* font-family inherits from html (parabolica via --font-body). The previous
+       font-gt-america-regular utility was silently overriding it — which is
+       why earlier --font-body changes appeared to do nothing. */
   }
   
   section,
@@ -300,7 +307,14 @@
     font-family: var(--font-body);
     background-color: var(--color-background);
     color: var(--color-text);
-    line-height: 1.5;
+    line-height: 1.6;
+  }
+
+  /* Headings use parabolica's display cut where available; layouts that need
+     a different weight (projects.css, home.css) override locally. */
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+    font-weight: 600;
   }
 
   body {

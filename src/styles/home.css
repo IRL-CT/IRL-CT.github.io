@@ -120,7 +120,9 @@
   font-size: 1.5rem;
   font-weight: 600;
   margin: 0 0 0.75rem 0;
-  color: rgb(var(--color-accent));
+  color: rgb(var(--color-text-base));
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
 }
 
 .location-link {
@@ -388,11 +390,15 @@
   position: relative;
   /* Remove any box-shadow if it was added via browser default styles */
   box-shadow: none;
+  /* Card-level affordance is the lift below; suppress the global a:hover underline
+     that would otherwise draw through the title's descenders. */
+  text-decoration: none;
 }
 
 .project-scroll-item:hover {
   transform: translateY(-5px);
   z-index: 2;
+  text-decoration: none;
 }
 
 .project-square-image {
@@ -439,11 +445,16 @@
 .team-card {
   position: relative;
   transition: transform 0.2s ease;
+  /* Override the global a { text-skin-accent } so member names render in the
+     base text color instead of accent blue. The lift on hover is the affordance. */
+  color: rgb(var(--color-text-base));
+  text-decoration: none;
 }
 
 .team-card:hover {
   transform: translateY(-3px);
   z-index: 1;
+  text-decoration: none;
 }
 
 .team-card:not(:last-child)::after {
@@ -495,10 +506,10 @@
   min-height: 3.5rem;
   display: flex;
   align-items: flex-end; /* Align text to bottom of the header container */
-  color: rgb(var(--color-accent));
+  color: rgb(var(--color-text-base));
 }
 
-#projects-header { 
+#projects-header {
   margin-bottom: -3rem; /* Reduce bottom margin */
 }
 
@@ -509,8 +520,35 @@
 .column-header h2 {
   font-size: 1.3rem;
   font-weight: 600;
-  color: rgb(var(--color-accent));
+  color: rgb(var(--color-text-base));
   margin: 0;
+  text-transform: uppercase;
+  /* Caps need positive tracking to breathe, but parabolica's caps have built-in
+     side bearings — 0.03em is enough to feel intentional without stretching. */
+  letter-spacing: 0.03em;
+  /* Visually thicken on hover via animated text-shadow — parabolica is
+     served as discrete static weights, so animating font-weight itself
+     would snap. text-shadow interpolates smoothly and adds no layout shift. */
+  transition: text-shadow 0.25s ease-out;
+}
+
+/* Linkable column headers (Research Team, Recent Publications) — kill the
+   global a:hover underline and use a smooth thickening as the affordance instead. */
+a.column-header,
+a.column-header:hover {
+  text-decoration: none;
+}
+
+a.column-header:hover h2 {
+  /* Stacked zero-blur shadows act as a hairline outline that visually weights
+     the strokes. Four layers at 0.6px give a clear "Bold"-feeling thickening
+     while staying crisp — more layers add weight without going blurry, which
+     a single larger radius would. */
+  text-shadow:
+    0 0 0.6px currentColor,
+    0 0 0.6px currentColor,
+    0 0 0.6px currentColor,
+    0 0 0.6px currentColor;
 }
 
 .column-content {
