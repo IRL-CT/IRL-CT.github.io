@@ -33,8 +33,8 @@ jobs:
         uses: withastro/action@v3
         with:
           # path: . # The root location of your Astro project inside the repository. (optional)
-          node-version: 20 # The specific version of Node that should be used to build your site. Defaults to 20. (optional)
-          package-manager: pnpm # Using pnpm as defined in the setup step above
+          node-version: 22 # current LTS; pnpm 11 (the floating "latest") requires >= 22.13
+          package-manager: pnpm@10 # pin (was pnpm@latest -> floated to v11 -> broke on node 20 via missing node:sqlite)
         env:
           PUBLIC_GOOGLE_ANALYTICS_ID: ${{ vars.PUBLIC_GOOGLE_ANALYTICS_ID }}
 
